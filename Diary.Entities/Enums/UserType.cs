@@ -1,9 +1,10 @@
 ﻿namespace Diary.Entities.Enums
 {
-    public enum UserType
+    public enum UserRole
     {
         Student,
         Parent,
+        Teacher,
         Admin
     }
 }

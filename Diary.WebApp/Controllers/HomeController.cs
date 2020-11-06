@@ -17,9 +17,9 @@ namespace Diary.WebApp.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _options;
-        private readonly IRepository<AppUser> repository;
+        private readonly IRepository<User> repository;
 
-        public HomeController(ILogger<HomeController> logger, IConfiguration options, IRepository<AppUser> repository)
+        public HomeController(ILogger<HomeController> logger, IConfiguration options, IRepository<User> repository)
         {
             _logger = logger;
             _options = options;
