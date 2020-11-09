@@ -5,11 +5,17 @@ VisualStudioVersion = 16.0.29728.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Diary.WebApp", "Diary.WebApp\Diary.WebApp.csproj", "{55AF9065-DC7D-4ABE-B301-B524D46D1DCB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diary.Entities", "Diary.Entities\Diary.Entities.csproj", "{02349694-40F6-4DF4-990B-8385BB6F18CF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Diary.Entities", "Diary.Entities\Diary.Entities.csproj", "{02349694-40F6-4DF4-990B-8385BB6F18CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diary.Interfaces", "Diary.Interfaces\Diary.Interfaces.csproj", "{C20A1DAD-E329-4EF3-91D1-BEBBBAC4B541}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Diary.Interfaces", "Diary.Interfaces\Diary.Interfaces.csproj", "{C20A1DAD-E329-4EF3-91D1-BEBBBAC4B541}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diary.Data", "Diary.Data\Diary.Data.csproj", "{67C5E70E-ACAE-4782-A6A9-FA8E9E388D11}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Diary.Data", "Diary.Data\Diary.Data.csproj", "{67C5E70E-ACAE-4782-A6A9-FA8E9E388D11}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Diary.Services", "Diary.Services\Diary.Services.csproj", "{0D721C67-F83D-45C1-941D-1CB0FD3D057E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Diary.Models", "Diary.Models\Diary.Models.csproj", "{F06F3A15-29ED-46DE-A787-30B8F6500928}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diary.Identity", "Diary.Identity\Diary.Identity.csproj", "{D0FA9757-0CFE-40C0-9393-4F36B2703322}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +39,18 @@ Global
 		{67C5E70E-ACAE-4782-A6A9-FA8E9E388D11}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{67C5E70E-ACAE-4782-A6A9-FA8E9E388D11}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{67C5E70E-ACAE-4782-A6A9-FA8E9E388D11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D721C67-F83D-45C1-941D-1CB0FD3D057E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D721C67-F83D-45C1-941D-1CB0FD3D057E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D721C67-F83D-45C1-941D-1CB0FD3D057E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D721C67-F83D-45C1-941D-1CB0FD3D057E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F06F3A15-29ED-46DE-A787-30B8F6500928}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F06F3A15-29ED-46DE-A787-30B8F6500928}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F06F3A15-29ED-46DE-A787-30B8F6500928}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F06F3A15-29ED-46DE-A787-30B8F6500928}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0FA9757-0CFE-40C0-9393-4F36B2703322}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0FA9757-0CFE-40C0-9393-4F36B2703322}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0FA9757-0CFE-40C0-9393-4F36B2703322}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0FA9757-0CFE-40C0-9393-4F36B2703322}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

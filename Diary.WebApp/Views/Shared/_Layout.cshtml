@@ -24,12 +24,32 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                        <li class="nav-item">
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <p>@User.Identity.Name</p>
+
+                                <form method="post" asp-controller="Account" asp-action="Logout">
+                                    <input type="submit" value="Выход" />
+                                </form>
+                            }
+                            else
+                            {
+                                <a asp-controller="Account" asp-action="Login">Вход</a>
+                            }
+
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a asp-controller="Account" asp-action="Register">Регистрация</a>
+                            }
+                        </li>
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
     <div class="container">
+
         <main role="main" class="pb-3">
             @RenderBody()
         </main>

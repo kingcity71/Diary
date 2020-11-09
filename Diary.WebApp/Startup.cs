@@ -4,12 +4,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using Diary.Data;
 using Diary.Data.Repository;
+using Diary.Identity;
 using Diary.Interfaces;
+using Diary.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Diary.WebApp
 {
@@ -27,8 +33,45 @@ namespace Diary.WebApp
         {
             services.AddOptions();
             services.AddDbContext<Context>();
+            services.AddDbContext<IdentityContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DiaryIdentity")));
+            
             services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
-            services.AddControllersWithViews();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IPropertyValueService, PropertyValueService>();
+
+
+
+            services.AddIdentity<User, IdentityRole>()
+                .AddEntityFrameworkStores<IdentityContext>();
+
+            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            //        .AddJwtBearer(options =>
+            //        {
+            //            options.RequireHttpsMetadata = false;
+            //            options.TokenValidationParameters = new TokenValidationParameters
+            //            {
+            //                // укзывает, будет ли валидироваться издатель при валидации токена
+            //                ValidateIssuer = true,
+            //                // строка, представляющая издателя
+            //                ValidIssuer = AuthOptions.ISSUER,
+
+            //                // будет ли валидироваться потребитель токена
+            //                ValidateAudience = true,
+            //                // установка потребителя токена
+            //                ValidAudience = AuthOptions.AUDIENCE,
+            //                // будет ли валидироваться время существования
+            //                ValidateLifetime = true,
+
+            //                // установка ключа безопасности
+            //                IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+            //                // валидация ключа безопасности
+            //                ValidateIssuerSigningKey = true,
+            //            };
+            //        });
+
+
+            services.AddControllersWithViews().AddRazorRuntimeCompilation();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -46,6 +89,7 @@ namespace Diary.WebApp
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -54,6 +98,8 @@ namespace Diary.WebApp
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            
         }
     }
 }

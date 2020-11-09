@@ -1,4 +1,0 @@
-1,2,3 DateTime BirthDate 
-3  DateTime CareerStartDate
-3  string EducationPlace
-3  string Name

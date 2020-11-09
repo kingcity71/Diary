@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Diary.Entities\Diary.Entities.csproj" />
-    <ProjectReference Include="..\Diary.Models\Diary.Models.csproj" />
+    <ProjectReference Include="..\Diary.Interfaces\Diary.Interfaces.csproj" />
   </ItemGroup>
 
 </Project>

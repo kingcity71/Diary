@@ -6,7 +6,7 @@ namespace Diary.Data
 {
     public class Context : DbContext
     {
-        const string SQL_CONNECTION_CONFIG_NAME = "SqlConnectionString";
+        const string SQL_CONNECTION_CONFIG_NAME = "Diary";
         readonly string _connectionString;
 
         public Context(IConfiguration configuration)
@@ -22,7 +22,7 @@ namespace Diary.Data
 
         public DbSet<Property> Properties { get; set; }
 
-        public DbSet<PropertyValue> PropertieValues { get; set; }
+        public DbSet<PropertyValue> PropertyValues { get; set; }
 
         public DbSet<Subject> Subjects { get; set; }
 
