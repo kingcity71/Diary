@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 namespace Diary.Services
 {
     public partial class UserService : IUserService, 
-        IStudentService, IParentService
+        IStudentService, IParentService, ITeacherService
     {
         private readonly IRepository<User> _userRepo;
         private readonly IPropertyValueService _propertyValueService;

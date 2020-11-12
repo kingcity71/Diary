@@ -40,6 +40,7 @@ namespace Diary.WebApp
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IStudentService, UserService>();
             services.AddScoped<IParentService, UserService>();
+            services.AddScoped<ITeacherService, UserService>();
             services.AddScoped<IPropertyValueService, PropertyValueService>();
             
             services.AddScoped<IClassService, ClassService>();

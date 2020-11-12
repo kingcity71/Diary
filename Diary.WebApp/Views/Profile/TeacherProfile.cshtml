@@ -1,0 +1,18 @@
+﻿@model Diary.Models.TeacherModel;
+@{
+    ViewData["Title"] = "StudentProfile";
+}
+
+@{
+    var experiance = (DateTime.Now - Model.CareerStartDate).TotalDays;
+    var expYear = experiance / 365 > 0 ? $"{Math.Floor(experiance / 365)} г.," : string.Empty;
+    var expDays = $"{Math.Floor(experiance % 365)} д.";
+    var expStr = expYear + expDays;
+}
+
+<h1>Личный кабинет учителя</h1>
+
+<div>Имя : @Model.Name</div>
+<div>Дата Рождения : @Model.BirthDate.ToString("dd.MM.yyyy")</div>
+<div>Стаж :  @expStr (с @Model.CareerStartDate.ToString("dd.MM.yyyy"))</div>
+<div>Место получения образования : @Model.EducationPlace</div>
