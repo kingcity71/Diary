@@ -1,0 +1,16 @@
+﻿@model Diary.Models.ClassModel;
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Класс "@Model.FullName"</h1>
+<h3>Список учеников</h3>
+@foreach (var student in @Model.Students)
+{
+    <div>
+        <a asp-controller="Profile" asp-action="StudentProfile" asp-route-id="@student.Id">
+            @student.Name
+        </a>   
+    </div>
+}
+

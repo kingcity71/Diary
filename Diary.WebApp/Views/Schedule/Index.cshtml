@@ -1,0 +1,97 @@
+﻿@model Diary.WebApp.Models.MonthScheduleViewModel;
+@{
+    ViewData["Title"] = "Schedule";
+    var dayOfWeek = new[] { "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вск" };
+    var months = new[] { "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+        "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь" };
+
+    var prevDate = Model.Date.AddMonths(-1);
+    var nextDate = Model.Date.AddMonths(+1);
+}
+<style>
+    .calendar-cell {
+        border: 1px solid gray;
+        border-radius: 3px;
+        font-size: 23px;
+    }
+
+    .calendar-cell-disabled {
+        background: lightgray;
+        color: dimgrey;
+    }
+
+        .calendar-cell-disabled:hover {
+            cursor: not-allowed;
+        }
+
+    .calendar-cell-active:hover {
+        cursor: pointer;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    .btn:hover {
+        cursor: pointer;
+    }
+</style>
+
+<hr />
+<div class="row m-1">
+
+    <div class="col-lg-2" onclick="prevMonth()">
+        <div class="btn btn-primary w-100">Пред. месяц</div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="text-center" style="font-size:25px">Расписание : @months[Model.Date.Month - 1], @Model.Date.Year</div>
+    </div>
+
+    <div class=" col-lg-2" onclick="nextMonth()">
+        <div class="btn btn-primary w-100">След. месяц</div>
+    </div>
+
+</div>
+<div class="row">
+    @foreach (var day in dayOfWeek)
+    {
+        <div class="col-lg m-1 text-center">
+            @day
+        </div>
+    }
+</div>
+
+@for (var i = 0; i < Model.CalendarMatrix.GetLength(0); i++)
+{
+    <div class="row">
+        @for (var j = 0; j < Model.CalendarMatrix[i].GetLength(0); j++)
+        {
+            @if (Model.CalendarMatrix[i][j] != 0)
+            {
+                <div class="col-lg m-1 text-center calendar-cell calendar-cell-active"
+                     onclick="schedDay(this)" data-day="@Model.CalendarMatrix[i][j]">
+                    @Model.CalendarMatrix[i][j]
+                </div>
+            }
+            else
+            {
+                <div class="col-lg m-1 text-center calendar-cell calendar-cell-disabled">
+                    X
+                </div>
+            }
+        }
+    </div>
+}
+<script>
+    let schedDay = (context) => {
+        let day = $(context).data('day');
+        redirect('/Schedule/DaySchedule/@(Model.Date.Year)/@(Model.Date.Month)/'+day);
+    }
+
+    let prevMonth = () => {
+        redirect('/Schedule/Index/@(prevDate.Month)/@(prevDate.Year)/');
+    }
+
+    let nextMonth = () => {
+        let specId = $('#specializations').val();
+        redirect('/Schedule/Index/@(nextDate.Month)/@(nextDate.Year)/');
+    }
+</script>

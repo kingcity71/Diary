@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="10.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Diary.Entities\Diary.Entities.csproj" />
     <ProjectReference Include="..\Diary.Interfaces\Diary.Interfaces.csproj" />
   </ItemGroup>

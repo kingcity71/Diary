@@ -1,0 +1,27 @@
+﻿@model Diary.Models.StudentModel;
+@{
+    ViewData["Title"] = "StudentProfile";
+}
+
+<h1>Личный кабинет ученика</h1>
+
+<div>Имя : @Model.Name</div>
+<div>
+    Класс :
+    <a asp-controller="Class" asp-action="Index" asp-route-id="@Model.ClassModel.Id">
+        @Model.ClassModel.FullName
+    </a>
+</div>
+<div>Дата Рождения : @Model.BirthDate.ToString("dd.MM.yyyy")</div>
+@if (Model.Parents != null && Model.Parents.Any())
+{
+    <div>
+        Родители :
+        @foreach (var parent in Model.Parents)
+        {
+            <span>
+                <a asp-controller="Profile" asp-action="ParentProfile" asp-route-id="@parent.Id">@parent.Name</a>
+            </span>
+        }
+    </div>
+}

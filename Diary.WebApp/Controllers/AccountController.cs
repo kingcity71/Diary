@@ -60,7 +60,7 @@ namespace Diary.WebApp
                 userModel.Name = model.Name;
                 userModel.Login = login;
                 userModel.Role = model.Role;
-                //_userService.CreateUser(userModel);
+                _userService.CreateUser(userModel);
 
                 if (result.Succeeded)
                 {
@@ -96,8 +96,6 @@ namespace Diary.WebApp
             return View(model);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             // удаляем аутентификационные куки

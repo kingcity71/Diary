@@ -38,9 +38,12 @@ namespace Diary.WebApp
             
             services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IStudentService, UserService>();
+            services.AddScoped<IParentService, UserService>();
             services.AddScoped<IPropertyValueService, PropertyValueService>();
-
-
+            
+            services.AddScoped<IClassService, ClassService>();
+            services.AddScoped<IScheduleService, ScheduleService>();
 
             services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<IdentityContext>();

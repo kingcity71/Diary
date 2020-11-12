@@ -24,6 +24,8 @@ namespace Diary.Data
 
         public DbSet<PropertyValue> PropertyValues { get; set; }
 
+        public DbSet<Schedule> Schedules { get; set; }
+
         public DbSet<Subject> Subjects { get; set; }
 
         public DbSet<User> Users { get; set; }
