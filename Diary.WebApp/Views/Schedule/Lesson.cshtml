@@ -1,0 +1,111 @@
+﻿@using Diary.Models;
+@using Diary.Models.Enums;
+@model LessonModel;
+@{
+    ViewData["Title"] = "Страница Урока";
+    var scoreMapper = new Dictionary<ScoreResult, string>
+{
+        {ScoreResult.None, "Н" },
+        {ScoreResult.Two, ((int)ScoreResult.Two).ToString() },
+        {ScoreResult.Three, ((int)ScoreResult.Three).ToString() },
+        {ScoreResult.Four, ((int)ScoreResult.Four).ToString() },
+        {ScoreResult.Five, ((int)ScoreResult.Five).ToString() }
+    };
+
+    var hasPermission = User.IsInRole("Admin") || User.IsInRole("Teacher");
+}
+@Html.HiddenFor(x => x.ScheduleInfo.Id)
+<style>
+    .btn:hover{
+        cursor:pointer;
+    }
+</style>
+
+<h3>Урок @Model.ScheduleInfo.Subject</h3>
+<h4>Преподает @Model.ScheduleInfo.Teacher.Name</h4>
+<h4>Время @Model.ScheduleInfo.Date.ToString("HH.mm")</h4>
+
+<br />
+<div class="row m-1">
+    <div class="col-lg-10 text-center"><h3> Оценки за урок</h3></div>
+    <div class="col-lg-2">
+        @if (hasPermission)
+        {
+            <div class="btn btn-success" id="btn-save">
+                Сохранить
+            </div>
+        }
+    </div>
+</div>
+<div class="row m-1">
+    <div class="col-lg-4">
+        ФИО
+    </div>
+    <div class="col-lg-4">
+        Оценка
+    </div>
+    <div class="col-lg-4">
+        Комментарий
+    </div>
+</div>
+@foreach (var student in Model.ScheduleInfo.Class.Students)
+{
+
+    <div class="row m-1 student-line" data-id="@student.Id">
+        <div class="col-lg-4">
+            @student.Name
+        </div>
+        <div class="col-lg-4">
+            @{
+                var score = Model.Scores.FirstOrDefault(x => x.StudentModel.Id == student.Id);
+                <select class="form-control w-100 score-select" data-id="@(score != null ? score.Id : Guid.Empty)" disabled="@(!hasPermission)">
+                    <option selected="@(score == null)">Выберите</option>
+                    @foreach (var scoreMap in scoreMapper)
+                    {
+                        <option value="@scoreMap.Key"
+                                selected="@(score!=null && scoreMap.Key == score.ScoreResult)">
+                            @scoreMap.Value
+                        </option>
+                    }
+                </select>
+            }
+        </div>
+        <div class="col-lg-4">
+            <input class="form-control w-100 score-comment" value="@score?.Comment" readonly="@(!hasPermission)">
+        </div>
+    </div>
+}
+
+<script>
+    $('#btn-save').on('click', function () {
+        var data = [];
+        var SchedId = $('#ScheduleInfo_Id').val();
+        
+        var lines = $('.student-line');
+        for (var i = 0; i < lines.length; i++) {
+            var line = $(lines[i]);
+            var scoreSelect = $(line.find('.score-select')[0]);
+            var StudentId = line.data('id');
+            var ScoreType = scoreSelect.val();
+            var ScoreId = scoreSelect.data('id');
+            var ScoreComment = $(line.find('.score-comment')[0]).val();
+            data.push({
+                SchedId, ScoreComment, ScoreId, StudentId, ScoreType
+            });
+        }
+
+        
+        $.ajax({
+            type: "POST",
+            url: "/schedule/UpdateScores",
+            data: { scores: data },
+            success: function (response) {
+                if (!response.item1)
+                    alert(response.item2)
+                else
+                    alert(response.item2)
+            },
+            dataType: "json"
+        });
+    });
+</script>

@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using Diary.Models.Enums;
 using Diary.Interfaces;
+using Diary.Models;
 using Diary.WebApp.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,12 +14,15 @@ namespace Diary.WebApp.Controllers
         private readonly IScheduleService _scheduleService;
         
         private readonly IUserService _userService;
+        private readonly IScoreService _scoreService;
 
-        public ScheduleController(IScheduleService scheduleService, RoleManager<IdentityRole> roleManager, IUserService userService)
+        public ScheduleController(IScheduleService scheduleService, RoleManager<IdentityRole> roleManager, 
+            IUserService userService, IScoreService scoreService)
             : base(roleManager)
         {
             _scheduleService = scheduleService;
             _userService = userService;
+            _scoreService = scoreService;
         }
 
         [HttpGet("Schedule/Index")]
@@ -45,6 +51,40 @@ namespace Diary.WebApp.Controllers
             viewModel.Date = dayDate;
 
             return View(viewModel);
+        }
+    
+        public IActionResult Lesson(Guid schedId)
+        {
+            var lessonModel = _scheduleService.GetLesson(schedId);
+            return View(lessonModel);
+        }
+        [HttpPost]
+        public string Test()
+            => "test";
+
+        [HttpPost]
+        public dynamic UpdateScores(IEnumerable<ScoreDTO> scores)
+        {
+            var scoreModels = new List<ScoreModel>();
+            foreach (var score in scores)
+            {
+                var scoreModel = Activator.CreateInstance<ScoreModel>();
+                scoreModel.Id = score.ScoreId;
+                scoreModel.Comment = score.ScoreComment;
+                scoreModel.ScheduleId = score.SchedId;
+                scoreModel.StudentModel = new UserModel() { Id = score.StudentId };
+
+                if (!Enum.TryParse(typeof(ScoreResult), score.ScoreType, out var type))
+                    return new { Item1 = false, Item2 = "Укажите оценку всем ученикам!" };
+
+                scoreModel.ScoreResult = (ScoreResult)type;
+
+                scoreModels.Add(scoreModel);
+            }
+
+            _scoreService.Update(scoreModels);
+
+            return new{Item1 = true, Item2 = "Данные успешно сохранены!"};
         }
     }
 }

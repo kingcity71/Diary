@@ -2,10 +2,10 @@
 
 @model Diary.WebApp.Models.ScheduleDayViewModel;
 @{
-    var ADMIN_ROLE = "Admin";
-    var STUDENT_ROLE = "Student";
-    var PARENT_ROLE = "Parent";
-    var TEACHER_ROLE = "Teacher";
+    const string ADMIN_ROLE = "Admin";
+    const string STUDENT_ROLE = "Student";
+    const string PARENT_ROLE = "Parent";
+    const string TEACHER_ROLE = "Teacher";
 
     var EMPTY_TIME = "Занятия нет";
 
@@ -13,26 +13,45 @@
     var dateTimeStart = Model.Date.Date.AddHours(9);
 
     var dateTimeEnd = Model.Date.Date.AddHours(16);
-    
+
+    var role = string.Empty;
+
+    if (User.IsInRole(PARENT_ROLE)) role = PARENT_ROLE;
+    if (User.IsInRole(STUDENT_ROLE)) role = STUDENT_ROLE;
+    if (User.IsInRole(TEACHER_ROLE)) role = TEACHER_ROLE;
 
     string getAdditionalInfo(ScheduleModel scheduleModel)
     {
-        if(User.IsInRole(STUDENT_ROLE))
-            return scheduleModel.Subject;
+        switch (role)
+        {
+            case STUDENT_ROLE:
+            case PARENT_ROLE:
+                return $"{scheduleModel.Subject} ({scheduleModel.Teacher.Name})";
 
-        if (User.IsInRole(TEACHER_ROLE))
-            return scheduleModel.Class.FullName;
-
-        if (User.IsInRole(PARENT_ROLE))
-            return $"{scheduleModel.Subject}, {scheduleModel.Teacher}";
-
-        return string.Empty;
+            case TEACHER_ROLE:
+                return $"{scheduleModel.Subject} ({scheduleModel.Class.FullName})";
+            default:
+                return string.Empty;
+        }
     };
 }
 
 <h1>Расписание на @Model.Date.ToShortDateString()</h1>
-@for(var dateTime = dateTimeStart; dateTime<dateTimeEnd; dateTime = dateTime.AddMinutes(45))
+@for (var dateTime = dateTimeStart; dateTime < dateTimeEnd; dateTime = dateTime.AddMinutes(45))
 {
     var sched = Model.ScheduleModels.FirstOrDefault(x => x.Date == dateTime);
-    <div data-hour="@dateTime.Hour" data-minute="@dateTime.Minute">@dateTime.ToShortTimeString() @(sched != null? getAdditionalInfo(sched) : EMPTY_TIME)</div>
+
+<div data-hour="@dateTime.Hour" data-minute="@dateTime.Minute">
+    @if (sched != null)
+    {
+        @*@(role)*@
+        <a asp-controller="Schedule" asp-action="Lesson" asp-route-schedId="@(sched.Id)">
+            @dateTime.ToShortTimeString() @getAdditionalInfo(sched)
+        </a>
+    }
+    else
+    {
+        <span>@dateTime.ToShortTimeString() @EMPTY_TIME</span>
+    }
+</div>
 }

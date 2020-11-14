@@ -14,15 +14,19 @@ namespace Diary.Services
         private readonly IRepository<Subject> _repoSubject;
         private readonly IRepository<ClassStudentRelationship> _repoClassStudentRelationship;
         private readonly IUserService _userService;
+        private readonly IScoreService _scoreService;
         private readonly IClassService _classService;
 
-        public ScheduleService(IRepository<Schedule> repoSched, IRepository<Subject> repoSubject, IRepository<ClassStudentRelationship> repoClassStudentRelationship, IUserService userService, IClassService classService)
+        public ScheduleService(IRepository<Schedule> repoSched, IRepository<Subject> repoSubject,
+            IRepository<ClassStudentRelationship> repoClassStudentRelationship, IUserService userService, IClassService classService,
+            IScoreService scoreService)
         {
             _repoSched = repoSched;
             _repoSubject = repoSubject;
             _repoClassStudentRelationship = repoClassStudentRelationship;
 
             _userService = userService;
+            _scoreService = scoreService;
             _classService = classService;
         }
         public void CreateSchedule(ScheduleModel model)
@@ -44,9 +48,9 @@ namespace Diary.Services
         private ScheduleModel GetScheduleModel(Schedule sched)
         {
             if (sched == null) return null;
-            var teacher = _userService.GetUser(sched.Id);
+            var teacher = _userService.GetUser(sched.TeacherId);
             var classModel = _classService.GetClassModel(sched.ClassId);
-            var subject = _repoSubject.GetItem(sched.Id);
+            var subject = _repoSubject.GetItem(sched.SubjectId);
 
             var schedModel = Activator.CreateInstance<ScheduleModel>();
             schedModel.Id = sched.Id;
@@ -60,7 +64,7 @@ namespace Diary.Services
 
         private IEnumerable<ScheduleModel> GetStudentScheduleByDay(DateTime day, Guid entityId)
         {
-            var classId = _repoClassStudentRelationship.GetAllItems().FirstOrDefault(x => x.StudentId == entityId)?.StudentId;
+            var classId = _repoClassStudentRelationship.GetAllItems().FirstOrDefault(x => x.StudentId == entityId)?.ClassId;
             if (classId == null) return null;
 
             var schedules = _repoSched.GetAllItems()
@@ -113,6 +117,14 @@ namespace Diary.Services
         public void UpdateSchedule(ScheduleModel model)
         {
             throw new NotImplementedException();
+        }
+
+        public LessonModel GetLesson(Guid schedId)
+        {
+            var lessonModel = Activator.CreateInstance<LessonModel>();
+            lessonModel.ScheduleInfo = GetSchedule(schedId);
+            lessonModel.Scores = _scoreService.GetScoreModels(schedId);
+            return lessonModel;
         }
     }
 }

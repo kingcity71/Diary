@@ -14,6 +14,7 @@ namespace Diary.Data
             _connectionString = configuration.GetConnectionString(SQL_CONNECTION_CONFIG_NAME);
         }
 
+        public DbSet<Score> Scores { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<ChildParentRelationship> ChildParents { get; set; }
 
