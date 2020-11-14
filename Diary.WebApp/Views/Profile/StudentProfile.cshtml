@@ -4,7 +4,15 @@
 }
 
 <h1>Личный кабинет ученика</h1>
+@if (User.Identity.Name.ToLower() != Model.Login)
+{
 
+    <div>
+        <a asp-controller="Chating" asp-action="Conversation" asp-route-interlocutorLogin="@Model.Login">
+            Написать сообщение
+        </a>
+    </div>
+}
 <div>Имя : @Model.Name</div>
 <div>
     Класс :

@@ -1,0 +1,18 @@
+﻿@using Diary.Models;
+@model IEnumerable<UserModel>;
+
+<h1>Мои диалоги</h1>
+@if (!Model.Any())
+{
+    <h3>Список диалогов пуст</h3>
+    return;
+}
+
+@foreach (var user in Model)
+{
+    <div>
+        <a asp-controller="Chating" asp-action="Conversation" asp-route-interlocutorLogin="@user.Login">
+            @user.Name
+        </a>
+    </div>
+}

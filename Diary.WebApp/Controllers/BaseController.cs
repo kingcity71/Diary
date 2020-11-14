@@ -14,6 +14,9 @@ namespace Diary.WebApp.Controllers
         {
             _roleManager = roleManager;
         }
+        protected string GetCurrentUser()
+            => User.Identity.Name;
+        
         protected string GetUserRole()
         {
             var roles = _roleManager.Roles;

@@ -7,10 +7,12 @@ using Diary.Data.Repository;
 using Diary.Identity;
 using Diary.Interfaces;
 using Diary.Services;
+using Diary.WebApp.Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,17 +33,27 @@ namespace Diary.WebApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
+
+            services.AddScoped<IMapper, MapperHelper>();
+
+            services.AddSignalR();
             services.AddOptions();
+            
             services.AddDbContext<Context>();
             services.AddDbContext<IdentityContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DiaryIdentity")));
             
             services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
+            services.AddScoped<IMessageRepository, MessageRepository>();
+
+
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IStudentService, UserService>();
             services.AddScoped<IParentService, UserService>();
             services.AddScoped<ITeacherService, UserService>();
             services.AddScoped<IPropertyValueService, PropertyValueService>();
+            services.AddScoped<IMessageService, MessageService>();
             
             services.AddScoped<IClassService, ClassService>();
             services.AddScoped<IScheduleService, ScheduleService>();
@@ -101,6 +113,7 @@ namespace Diary.WebApp
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapHub<ChatHub>("/chat");
             });
 
             

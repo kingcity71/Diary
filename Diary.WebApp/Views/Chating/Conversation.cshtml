@@ -1,0 +1,118 @@
+﻿@using Diary.WebApp.Models;
+@model ConversationModel;
+
+@{
+    ViewData["Title"] = "Сообщения";
+}
+
+<style>
+    #chatroom {
+        width: 100%;
+        border: 1px solid gray;
+        border-radius: 3px;
+        background: lightgray;
+    }
+    .msg-body,
+    .msg-from {
+        width: 90%;
+        margin-left: 5%;
+    }
+    
+    .msg-username {
+        font-weight: bold;
+    }
+
+    .msg-time {
+        font-size: 8px;
+    }
+
+    #inputForm {
+        width: 100%;
+    }
+
+    #message {
+        width: calc(100% - 200px);
+    }
+
+    #sendBtn {
+        width: 100px;
+    }
+
+    #msgLabel{
+        width: 90px;
+    }
+</style>
+
+<div>
+    <h3>
+        Диалог c @Model.UserLoginName[Model.InterlocutorLogin]
+    </h3>
+</div>
+
+<div id="inputForm">
+    <label for="message" id="msgLabel">Сообщение </label>
+    <input type="text" id="message" />
+    <input type="button" id="sendBtn" value="Отправить" />
+</div>
+<div id="chatroom">
+    @foreach (var msg in Model.Messages)
+    {
+        <div class="msg-from">
+            <div class="msg-username">
+                @Model.UserLoginName[msg.From]
+                <span class="msg-time">@msg.Date.ToString("dd.MM.yyyy HH:mm")</span>
+            </div>
+            <div class="msg-body">@msg.MessageBody</div>
+        </div>
+    }
+</div>
+<script src="~/js/signalr/dist/browser/signalr.min.js"></script>
+<script>
+    const hubConnection = new signalR.HubConnectionBuilder()
+        .withUrl("/chat")
+        .build();
+
+    const getDateTime = function () {
+        var currentdate = new Date();
+        var datetime = currentdate.getDate() + "."
+                + (currentdate.getMonth()+1)  + "."
+                + currentdate.getFullYear() + " "
+                + currentdate.getHours() + ":"
+            + currentdate.getMinutes()
+        return datetime;
+    }
+
+    hubConnection.on("Send", function (data) {
+
+        var dateTime = getDateTime();
+
+        var html = '<div class="msg-from">' +
+            '<div class="msg-username">' +
+            '@Model.UserLoginName[@Model.InterlocutorLogin]' +
+            '<span class="msg-time">' + dateTime + '</span>' +
+            '</div>' +
+            '<div class="msg-body">' + data + '</div>' +
+            '</div>';
+
+        $('#chatroom').prepend(html);
+
+    });
+
+    document.getElementById("sendBtn").addEventListener("click", function (e) {
+        let message = document.getElementById("message").value;
+
+        var dateTime = getDateTime();
+        var html = '<div class="msg-from">' +
+            '<div class="msg-username">' +
+            '@Model.UserLoginName[@Model.CurrentUserLogin]' +
+            '<span class="msg-time">' + dateTime + '</span>' +
+            '</div>' +
+            '<div class="msg-body">' + message + '</div>' +
+            '</div>';
+        $('#chatroom').prepend(html);
+        $('#message').val(' ');
+        hubConnection.invoke("Send", message, '@Model.InterlocutorLogin');
+    });
+
+    hubConnection.start();
+</script>

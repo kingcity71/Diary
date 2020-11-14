@@ -92,3 +92,6 @@ values  (newid(),'{DE18211F-6A1D-40D3-987F-0814C4A67B2E}','64CD0FD2-4335-4094-A7
 		(newid(), '{1A6B1BF8-0BB7-45F8-93F8-63A98BD8B260}','1810BDDC-2D6D-4FF0-8DA4-7FDBA7B5E5AC'),
 		(newid(), '{1A6B1BF8-0BB7-45F8-93F8-63A98BD8B260}','13721765-B6B8-4D37-8A2E-8D390DBBCD16')
 
+insert into [Messages] (id,[from],[to],[date],messagebody)
+  values (newid(),'parent1','teacher1','2020-11-14',N'Привет')
+

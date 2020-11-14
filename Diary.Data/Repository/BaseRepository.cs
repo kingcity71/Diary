@@ -10,7 +10,7 @@ namespace Diary.Data.Repository
     public class BaseRepository<T> : IRepository<T>
         where T : Entity
     {
-        readonly IConfiguration _configuration;
+        readonly protected IConfiguration _configuration;
         
         public BaseRepository(IConfiguration configuration)
         {
