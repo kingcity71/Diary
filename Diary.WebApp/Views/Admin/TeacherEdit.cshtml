@@ -20,12 +20,12 @@
 
     <div class="row">
         @Html.LabelFor(x => x.BirthDate, "Дата рождения (дд.мм.гггг)")
-        @Html.TextBoxFor(x => x.BirthDate, new { @class = "form-control" })
+        @Html.TextBoxFor(x => x.BirthDate, new { @class = "form-control datetimepicker" })
     </div>
 
     <div class="row">
         @Html.LabelFor(x => x.CareerStartDate, "Дата начала карьеры (дд.мм.гггг)")
-        @Html.TextBoxFor(x => x.CareerStartDate, new { @class = "form-control" })
+        @Html.TextBoxFor(x => x.CareerStartDate, new { @class = "form-control datetimepicker" })
     </div>
 
     <div class="row">
@@ -37,4 +37,13 @@
 <script>
      if ('@ViewBag.IsInvalid' == 'True')
         alert('Проверьте валидность данных')
+
+    $(function () {
+        $('.datetimepicker').datetimepicker({
+            locale: 'ru',
+            stepping: 10,
+            format: 'DD.MM.YYYY'
+        });
+    });
+
 </script>

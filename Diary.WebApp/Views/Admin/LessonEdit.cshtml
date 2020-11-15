@@ -1,0 +1,112 @@
+﻿@using Diary.WebApp.Models;
+@model LessonEditModel;
+@{
+    ViewData["Title"] = "LessonEdit";
+}
+<style>
+    #search-results {
+        background-color: white;
+        position: absolute;
+        padding: 3px 0;
+        border: 1px solid black;
+        border-radius: 3px;
+    }
+
+    .search-result-item:hover {
+        background-color: lightgray;
+        cursor: pointer;
+    }
+
+    .btn:hover{
+        cursor:pointer;
+    }
+</style>
+<h1>Управление уроком</h1>
+<input id="schedId" value ="@Model.Id" hidden />
+<input id="date" value ="@Model.DateTime.ToString()" hidden />
+
+<h3>Урок @Model.DateTime.ToString("dd.MM.yyyy HH.mm")</h3>
+
+<label>Класс</label>
+<select id="classes">
+    @foreach (var cl in @Model.Classes)
+    {
+        <option value="@cl.Key" selected="@(cl.Key==Model.ClassId)">@cl.Value</option>
+    }
+</select>
+
+<label>Урок</label>
+<select id="subjects">
+    @foreach (var cl in @Model.Subjects)
+    {
+        <option value="@cl.Key" selected="@(cl.Key==Model.SubjectId)">@cl.Value</option>
+    }
+</select>
+
+<div class="row">
+    @Html.LabelFor(x => x.TeacherName, "Учитель")
+    <input class="form-control teacher" id="teacher" data-id="@Model.TeacherId" value="@Model.TeacherName" />
+</div>
+
+<div class="btn btn-success" id="btnSave">
+    Сохранить
+</div>
+
+<script>
+    $('#btnSave').on('click', function () {
+        var schedId = $('#schedId').val();
+        var date = $('#date').val();
+        var classId = $('#classes').val();
+        var subjectId = $('#subjects').val();
+        var teacherId = $('#teacher').data('id');
+        
+        var data = { schedId, date, classId, subjectId, teacherId };
+
+        $.ajax({
+            type: "POST",
+            url: "/admin/LessonEdit",
+            data: {lessonDto:data},
+            success: function (response) {
+                window.location.href = 'index/';
+                if (!response.item1)
+                    alert(response.item2)
+                else
+                    alert(response.item2)
+            },
+            dataType: "json"
+        });
+        
+    });
+
+    $('.teacher').on('keyup', function (event) {
+        $('#search-results').remove();
+        var el = $(event.currentTarget);
+        var position = el.offset();
+
+        var value = el.val();
+        if (value.length < 3) return;
+        console.log(value);
+        $.get('/admin/TeacherParents?key=' + value, function (data) {
+            if (data.length === 0) return;
+            var html = '<div id="search-results">';
+            for (var i = 0; i < data.length; i++)
+                html += '<div class="search-result-item" onclick="setResult(this)" data-id="' + data[i].id + '">' + data[i].name + '</div>';
+            html += '</div>';
+            var newEl = $(html);
+            newEl.css("top", (position.top + 40) + "px");
+            newEl.css("left", position.left + "px");
+            newEl.insertAfter(el);
+        })
+    })
+
+        var setResult = function (ctx) {
+        var el = $(ctx);
+        el.parent('#search-results').prev().val(el.text());
+        el.parent('#search-results').prev().data('id',el.data('id'));
+
+        $('#search-results').remove();
+    }
+
+    if ('@ViewBag.IsInvalid' == 'True')
+        alert('Проверьте валидность данных')
+</script>

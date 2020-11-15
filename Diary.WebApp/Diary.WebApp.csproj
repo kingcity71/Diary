@@ -25,6 +25,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="wwwroot\js\bootstrap-datetimepicker.min.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Update="wwwroot\js\signalr\dist\browser\signalr.min.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

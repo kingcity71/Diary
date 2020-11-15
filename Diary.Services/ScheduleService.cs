@@ -29,10 +29,15 @@ namespace Diary.Services
             _scoreService = scoreService;
             _classService = classService;
         }
-        public void CreateSchedule(ScheduleModel model)
+        public IEnumerable<ScheduleModel> ScheduleSearch(DateTime date, Guid classId)
         {
-            throw new NotImplementedException();
+            var models = _repoSched.GetAllItems()
+                .Where(x => x.ClassId == classId && date.Date == x.Date.Date)
+                .Select(GetScheduleModel)
+                .ToList();
+            return models;
         }
+        
 
         public void DeleteSchedule(ScheduleModel model)
         {
@@ -116,12 +121,24 @@ namespace Diary.Services
 
         public void UpdateSchedule(ScheduleModel model)
         {
-            throw new NotImplementedException();
+            var scheduleEntity = Activator.CreateInstance<Schedule>();
+            scheduleEntity.Id = model.Id;
+            scheduleEntity.Date = model.Date;
+            scheduleEntity.ClassId = model.Class.Id;
+            scheduleEntity.TeacherId = model.Teacher.Id;
+            scheduleEntity.SubjectId = _repoSubject.GetAllItems().FirstOrDefault(x => x.Name == model.Subject).Id;
+
+            if (model.Id == Guid.Empty)
+                _repoSched.Create(scheduleEntity);
+            else
+                _repoSched.Update(scheduleEntity);
         }
 
         public LessonModel GetLesson(Guid schedId)
         {
             var lessonModel = Activator.CreateInstance<LessonModel>();
+            if (schedId == Guid.Empty) return lessonModel;
+            
             lessonModel.ScheduleInfo = GetSchedule(schedId);
             lessonModel.Scores = _scoreService.GetScoreModels(schedId);
             return lessonModel;

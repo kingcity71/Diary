@@ -37,14 +37,13 @@
 }
 
 <h1>Расписание на @Model.Date.ToShortDateString()</h1>
-@for (var dateTime = dateTimeStart; dateTime < dateTimeEnd; dateTime = dateTime.AddMinutes(45))
+@for (var dateTime = dateTimeStart; dateTime < dateTimeEnd; dateTime = dateTime.AddMinutes(50))
 {
     var sched = Model.ScheduleModels.FirstOrDefault(x => x.Date == dateTime);
 
 <div data-hour="@dateTime.Hour" data-minute="@dateTime.Minute">
     @if (sched != null)
     {
-        @*@(role)*@
         <a asp-controller="Schedule" asp-action="Lesson" asp-route-schedId="@(sched.Id)">
             @dateTime.ToShortTimeString() @getAdditionalInfo(sched)
         </a>

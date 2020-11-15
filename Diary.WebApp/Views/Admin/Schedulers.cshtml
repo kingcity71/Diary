@@ -1,0 +1,63 @@
+﻿@model Diary.WebApp.Models.AdminSchedules;
+@{
+    ViewData["Title"] = "Schedulers";
+}
+<style>
+    .btn:hover{
+        cursor:pointer;
+    }
+</style>
+<h1>Найти расписание</h1>
+<div class="row">
+    <div class="col-lg-4">
+        <select id="classes" class="form-control">
+            @foreach (var cl in Model.Classes)
+            {
+                <option value="@cl.Key">@cl.Value</option>
+            }
+        </select>
+        <label for="classes">Список классов</label>
+    </div>
+    <div class="col-lg-4">
+        <input class="form-control datetimepicker scheduleDate"/>
+        <label for="scheduleDate">Дата</label>
+    </div>
+    <div class="col-lg-4">
+        <div class="btn btn-primary" id="searchBtn">
+            Найти
+        </div>
+    </div>
+</div>
+
+<div class="row" id="data">
+
+</div>
+<script>
+    $('#searchBtn').on('click', function () {
+        var date = $($('.scheduleDate')[0]).val();
+        if (date == '') {
+            alert('Укажите дату');
+            return;
+        }
+
+        var id = $('#classes').val();
+        if (id === undefined || id == '') {
+            alert('Укажите класс');
+            return;
+        }
+
+        $.get('/admin/ScheduleSearch?date=' + date + '&classId=' + id, function (data) {
+            console.log(data);
+            $('#data').html(data);
+        })
+
+        
+    })
+    $(function () {
+            $('.datetimepicker').datetimepicker({
+                locale: 'ru',
+                stepping: 10,
+                format: 'DD.MM.YYYY'
+            });
+        });
+</script>

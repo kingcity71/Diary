@@ -58,9 +58,6 @@ namespace Diary.WebApp.Controllers
             var lessonModel = _scheduleService.GetLesson(schedId);
             return View(lessonModel);
         }
-        [HttpPost]
-        public string Test()
-            => "test";
 
         [HttpPost]
         public dynamic UpdateScores(IEnumerable<ScoreDTO> scores)

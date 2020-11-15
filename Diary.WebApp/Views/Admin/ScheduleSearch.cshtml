@@ -1,0 +1,57 @@
+﻿@using Diary.Models;
+
+@model Diary.WebApp.Models.ScheduleDayViewModel;
+
+@{
+    Layout = null;
+
+    ViewData["Title"] = "ScheduleDay";
+
+    var EMPTY_TIME = "Занятия нет";
+
+    var dateTimeStart = Model.Date.Date.AddHours(9);
+
+    var dateTimeEnd = Model.Date.Date.AddHours(16);
+
+    string getAdditionalInfo(ScheduleModel scheduleModel)
+    {
+        return $"{scheduleModel.Subject} ({scheduleModel.Teacher.Name})";
+    };
+}
+
+<h1>Расписание на @Model.Date.ToShortDateString()</h1>
+@for (var dateTime = dateTimeStart; dateTime < dateTimeEnd; dateTime = dateTime.AddMinutes(50))
+{
+    var sched = Model.ScheduleModels.FirstOrDefault(x => x.Date == dateTime);
+    <div class="col-lg-12">
+        <div data-hour="@dateTime.Hour" data-minute="@dateTime.Minute">
+            @if (sched != null)
+            {
+
+                <a asp-controller="Admin" asp-action="LessonEdit"
+                   asp-route-id="@sched.Id"
+                   asp-route-classId="@(sched.Class.Id)"
+                   asp-route-day="@(sched.Date.Day)"
+                   asp-route-year="@(sched.Date.Year)"
+                   asp-route-month="@(sched.Date.Month)"
+                   asp-route-hour="@dateTime.Hour"
+                   asp-route-min="@dateTime.Minute">
+                    @dateTime.ToShortTimeString() @getAdditionalInfo(sched)
+                </a>
+            }
+            else
+            {
+                <a asp-controller="Admin" asp-action="LessonEdit"
+                   asp-route-id="@Guid.Empty"
+                   asp-route-classId="@(Model.ClassId)"
+                   asp-route-day="@(dateTime.Day)"
+                   asp-route-year="@(dateTime.Year)"
+                   asp-route-month="@(dateTime.Month)"
+                   asp-route-hour="@dateTime.Hour"
+                   asp-route-min="@dateTime.Minute">
+                    @dateTime.ToShortTimeString() @EMPTY_TIME
+                </a>
+            }
+        </div>
+    </div>
+}

@@ -31,6 +31,7 @@ namespace Diary.Services
         }
         public TeacherModel GetTeacherModel(Guid id)
         {
+            if (id == Guid.Empty) return null;
             var userModel = GetUser(id);
             return GetTeacherModel(userModel);
         }

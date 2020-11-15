@@ -64,8 +64,8 @@ namespace Diary.WebApp
 
                 if (result.Succeeded)
                 {
-                    // установка куки
-                    await _signInManager.SignInAsync(user, false);
+                    //// установка куки
+                    //await _signInManager.SignInAsync(user, false);
                     return RedirectToAction("Index", "Home");
                 }
                 else

@@ -1,4 +1,5 @@
-﻿using Diary.Interfaces;
+﻿using Diary.Entities;
+using Diary.Interfaces;
 using Diary.Models;
 using Diary.WebApp.Models;
 using Microsoft.AspNetCore.Identity;
@@ -17,19 +18,25 @@ namespace Diary.WebApp.Controllers
         private readonly ITeacherService _teacherService;
         private readonly IParentService _parentService;
         private readonly IClassService _classService;
+        private readonly IScheduleService _scheduleService;
+        private readonly IRepository<Subject> _repoSubject;
 
         public AdminController(RoleManager<IdentityRole> roleManager,
             IUserService userService,
             IStudentService studentService,
             ITeacherService teacherService,
             IParentService parentService,
-            IClassService classService) : base(roleManager)
+            IClassService classService,
+            IScheduleService scheduleService,
+            IRepository<Subject> repoSubject) : base(roleManager)
         {
             _userService = userService;
             _studentService = studentService;
             _teacherService = teacherService;
             _parentService = parentService;
             _classService = classService;
+            _scheduleService = scheduleService;
+            _repoSubject = repoSubject;
         }
 
         public IActionResult Index()
@@ -56,7 +63,7 @@ namespace Diary.WebApp.Controllers
             studentDTO.Parent2Id = studentModel.Parents.Count() > 1 ? studentModel.Parents.LastOrDefault()?.Id ?? Guid.Empty : Guid.Empty;
             studentDTO.Parent2Name = studentModel.Parents.Count() > 1 ? studentModel.Parents.LastOrDefault()?.Name : string.Empty;
             studentDTO.BirthDate = studentModel.BirthDate;
-            studentDTO.ClassId = studentModel.ClassModel.Id;
+            studentDTO.ClassId = studentModel.ClassModel!=null? studentModel.ClassModel.Id : Guid.Empty;
             studentDTO.Classes = _classService.GetClasses()
                 .ToDictionary(x => x.Id, y => y.FullName);
 
@@ -144,7 +151,13 @@ namespace Diary.WebApp.Controllers
             var users = _userService.SearchUsers(key).Where(x => x.Role == "Parent").ToList();
             return users;
         }
-
+        [HttpGet]
+        public IEnumerable<UserModel> TeacherParents(string key)
+        {
+            var users = _userService.SearchUsers(key).Where(x => x.Role == "Teacher").ToList();
+            return users;
+        }
+        
         [HttpGet]
         public IActionResult ClassEdit(Guid? id)
         {
@@ -167,16 +180,89 @@ namespace Diary.WebApp.Controllers
             return RedirectToAction("ClassList","Class");
         }
 
-        [HttpGet]
-        public IActionResult ScheduleEdit()
-        {
-            return null;
-        }
-
+      
         public IEnumerable<UserModel> SearchUsers(string key) 
         {
             var users = _userService.SearchUsers(key).ToList();
             return users;
+        }
+
+        public IActionResult Schedulers()
+        {
+            return View(new AdminSchedules()
+            {
+                Classes = _classService.GetClasses()
+                .ToDictionary(x => x.Id, y => y.FullName)
+            });
+        }
+        [HttpGet]
+        public IActionResult ScheduleSearch(string date, Guid classId)
+        {
+            if (!DateTime.TryParse(date, out var dateTime)) return null;
+            var models = _scheduleService.ScheduleSearch(dateTime, classId);
+            var viewModel = new ScheduleDayViewModel();
+            viewModel.ScheduleModels = models;
+            viewModel.Date = dateTime;
+            viewModel.ClassId = classId;
+            return View(viewModel);
+        }
+
+        [HttpGet]
+        public IActionResult LessonEdit(Guid id, Guid classId, int year, int month, int day, int hour, int min)
+        {
+            var dateTime = new DateTime(year, month, day, hour, min, 0);
+
+            var schedModel = _scheduleService.GetSchedule(id);
+
+            var viewModel = new LessonEditModel();
+            viewModel.DateTime = dateTime;
+            viewModel.ClassId = schedModel!=null? schedModel.Class.Id : classId;
+            viewModel.Classes = _classService.GetClasses().ToDictionary(x => x.Id, y => y.FullName);
+            viewModel.TeacherId = schedModel == null ? Guid.Empty : schedModel.Teacher.Id;
+            viewModel.TeacherName = schedModel == null ? string.Empty : schedModel.Teacher.Name;
+            viewModel.Subjects = _repoSubject.GetAllItems().ToDictionary(x => x.Id, y => y.Name);
+            viewModel.SubjectId = schedModel == null ? Guid.Empty : viewModel.Subjects.FirstOrDefault(x => x.Value == schedModel.Subject).Key;
+            viewModel.Id = schedModel == null ? Guid.Empty: schedModel.Id;
+
+            return View(viewModel);
+        }
+
+        [HttpPost] 
+        public IActionResult LessonEdit(LessonEditDto lessonDto)
+        {
+            if(lessonDto.classId==Guid.Empty 
+                || !DateTime.TryParse(lessonDto.date, out var date)
+                || lessonDto.teacherId == Guid.Empty
+                || lessonDto.subjectId == Guid.Empty)
+            {
+                var dateTime = DateTime.Parse(lessonDto.date);
+
+                var teacherModel = _teacherService.GetTeacherModel(lessonDto.teacherId);
+
+                var viewModel = new LessonEditModel();
+                viewModel.DateTime = dateTime;
+                viewModel.ClassId = lessonDto.classId;
+                viewModel.Classes = _classService.GetClasses().ToDictionary(x => x.Id, y => y.FullName);
+                viewModel.TeacherId = lessonDto.teacherId;
+                viewModel.TeacherName = teacherModel != null ? teacherModel.Name : string.Empty;
+                viewModel.Subjects = _repoSubject.GetAllItems().ToDictionary(x => x.Id, y => y.Name);
+                viewModel.SubjectId = lessonDto.schedId;
+                viewModel.Id = lessonDto.schedId;
+
+                ViewBag.IsInvalid = true;
+                return View(viewModel);
+            }
+
+            var schedModel = Activator.CreateInstance<ScheduleModel>();
+            schedModel.Id = lessonDto.schedId;
+            schedModel.Date = DateTime.Parse(lessonDto.date);
+            schedModel.Class = new ClassModel { Id = lessonDto.classId };
+            schedModel.Teacher = new TeacherModel { Id = lessonDto.teacherId };
+            schedModel.Subject = _repoSubject.GetAllItems().FirstOrDefault(x => x.Id == lessonDto.subjectId).Name;
+
+            _scheduleService.UpdateSchedule(schedModel);
+
+            return RedirectToAction("Index","Admin");
         }
     }
 }
