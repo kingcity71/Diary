@@ -1,7 +1,40 @@
-﻿
+﻿@using Diary.Models;
+@model TeacherModel;
 @{
     ViewData["Title"] = "TeacherEdit";
 }
 
-    <h1>TeacherEdit</h1>
+<h1>Страница редактирования данных учителя</h1>
+<form asp-action="TeacherEdit" method="post">
+    @Html.HiddenFor(x => x.Id)
+    @Html.HiddenFor(x => x.Login)
+    <div class="row">
+        @Html.LabelFor(x => x.Login, "Логин")
+        @Html.TextBoxFor(x => x.Login, new { @class = "form-control", disabled = true })
+    </div>
 
+    <div class="row">
+        @Html.LabelFor(x => x.Name, "ФИО")
+        @Html.TextBoxFor(x => x.Name, new { @class = "form-control" })
+    </div>
+
+    <div class="row">
+        @Html.LabelFor(x => x.BirthDate, "Дата рождения (дд.мм.гггг)")
+        @Html.TextBoxFor(x => x.BirthDate, new { @class = "form-control" })
+    </div>
+
+    <div class="row">
+        @Html.LabelFor(x => x.CareerStartDate, "Дата начала карьеры (дд.мм.гггг)")
+        @Html.TextBoxFor(x => x.CareerStartDate, new { @class = "form-control" })
+    </div>
+
+    <div class="row">
+        @Html.LabelFor(x => x.EducationPlace, "Место получения образования")
+        @Html.TextBoxFor(x => x.EducationPlace, new { @class = "form-control" })
+    </div>
+    <button type="submit" class="btn btn-success">Сохранить</button>
+</form>
+<script>
+     if ('@ViewBag.IsInvalid' == 'True')
+        alert('Проверьте валидность данных')
+</script>

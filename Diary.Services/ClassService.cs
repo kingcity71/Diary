@@ -51,6 +51,17 @@ namespace Diary.Services
 
             return classModel;
         }
+        public void Update(ClassModel classModel)
+        {
+            var classEntity = _mapper.Map<ClassModel, Class>(classModel);
+            if (classEntity.Id == Guid.Empty)
+            {
+                classEntity.Id = Guid.NewGuid();
+                _repoClass.Create(classEntity);
+            }
+            else
+                _repoClass.Update(classEntity);
+        }
         public ClassModel GetClassModel(Guid? id)
         {
             if (id == null) return null;

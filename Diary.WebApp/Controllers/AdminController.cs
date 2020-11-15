@@ -51,14 +51,14 @@ namespace Diary.WebApp.Controllers
             studentDTO.Id = studentModel.Id;
             studentDTO.Login = studentModel.Login;
             studentDTO.Name = studentModel.Name;
-            studentDTO.Parent1Id =  studentModel.Parents.FirstOrDefault()?.Id ?? Guid.Empty;
-            studentDTO.Parent1Name =  studentModel.Parents.FirstOrDefault()?.Name;
+            studentDTO.Parent1Id = studentModel.Parents.FirstOrDefault()?.Id ?? Guid.Empty;
+            studentDTO.Parent1Name = studentModel.Parents.FirstOrDefault()?.Name;
             studentDTO.Parent2Id = studentModel.Parents.Count() > 1 ? studentModel.Parents.LastOrDefault()?.Id ?? Guid.Empty : Guid.Empty;
             studentDTO.Parent2Name = studentModel.Parents.Count() > 1 ? studentModel.Parents.LastOrDefault()?.Name : string.Empty;
             studentDTO.BirthDate = studentModel.BirthDate;
             studentDTO.ClassId = studentModel.ClassModel.Id;
             studentDTO.Classes = _classService.GetClasses()
-                .ToDictionary(x=>x.Id, y=>y.FullName);
+                .ToDictionary(x => x.Id, y => y.FullName);
 
             return View(studentDTO);
         }
@@ -95,24 +95,84 @@ namespace Diary.WebApp.Controllers
 
             return RedirectToAction("UserList", "Admin");
         }
-
+        [HttpGet]
         public IActionResult TeacherEdit(Guid id)
         {
             var teacherModel = _teacherService.GetTeacherModel(id);
             return View(teacherModel);
         }
+        [HttpPost]
+        public IActionResult TeacherEdit(TeacherModel teacherModel)
+        {
+            if (string.IsNullOrEmpty(teacherModel.EducationPlace)
+                || string.IsNullOrEmpty(teacherModel.Name)
+                || DateTime.MinValue == teacherModel.CareerStartDate
+                || DateTime.MinValue == teacherModel.BirthDate)
+            {
+                ViewBag.IsInvalid = "True";
+                return View(teacherModel);
+            }
+
+            _teacherService.Update(teacherModel);
+
+            return RedirectToAction("UserList", "Admin");
+        }
+        [HttpGet]
         public IActionResult ParentEdit(Guid id)
         {
             var parentModel = _parentService.GetParentModel(id);
             return View(parentModel);
         }
+        [HttpPost]
+        public IActionResult ParentEdit(ParentModel parentModel)
+        {
+            if (string.IsNullOrEmpty(parentModel.Name)
+                || DateTime.MinValue == parentModel.BirthDate)
+            {
+                ViewBag.IsInvalid = "True";
+                return View(parentModel);
+            }
+
+            _parentService.Update(parentModel);
+
+            return RedirectToAction("UserList", "Admin");
+        }
 
         [HttpGet]
         public IEnumerable<UserModel> SearchParents(string key)
         {
-            var users = _userService.SearchUsers(key).Where(x=>x.Role=="Parent").ToList();
+            var users = _userService.SearchUsers(key).Where(x => x.Role == "Parent").ToList();
             return users;
         }
+
+        [HttpGet]
+        public IActionResult ClassEdit(Guid? id)
+        {
+            var classModel = _classService.GetClassModel(id);
+            if (classModel == null) classModel = new ClassModel();
+            return View(classModel);
+        }
+
+        [HttpPost]
+        public IActionResult ClassEdit(ClassModel classModel)
+        {
+            if (!((classModel.Letter>='а' && classModel.Letter <= 'я') ||
+                (classModel.Letter >= 'А' && classModel.Letter <= 'Я'))
+                || classModel.Number < 1 || classModel.Number > 11)
+            {
+                ViewBag.IsInvalid = "True";
+                return View(classModel);
+            }
+            _classService.Update(classModel);
+            return RedirectToAction("ClassList","Class");
+        }
+
+        [HttpGet]
+        public IActionResult ScheduleEdit()
+        {
+            return null;
+        }
+
         public IEnumerable<UserModel> SearchUsers(string key) 
         {
             var users = _userService.SearchUsers(key).ToList();

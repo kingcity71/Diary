@@ -23,21 +23,21 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
                     <ul class="navbar-nav flex-grow-1">
                         @*<li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                            </li>*@
+            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </li>*@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Schedule" asp-action="Index">Расписание</a>
                         </li>
 
-                        @if (User.Identity.IsAuthenticated)
+                        @if (User.Identity.IsAuthenticated && !User.IsInRole("Admin"))
                         {
 
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Class" asp-action="ClassList">Классы</a>
-                            </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-controller="Class" asp-action="ClassList">Классы</a>
+                    </li>
                         }
 
                         @if (User.IsInRole("Student"))
@@ -72,7 +72,7 @@
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">Регистрация нового пользователя</a>
+                                <a class="nav-link text-dark" asp-controller="Admin" asp-action="Index">На главную</a>
                             </li>
                         }
                         @if (User.Identity.IsAuthenticated)

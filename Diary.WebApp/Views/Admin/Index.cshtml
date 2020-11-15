@@ -6,5 +6,16 @@
 <h1>Админка</h1>
 
 <ul>
-    <li><a asp-controller="Admin" asp-action="UserList">Список пользователей</a></li>
+    <li>
+        <a asp-controller="Admin" asp-action="UserList">Список пользователей</a>
+    </li>
+    <li>
+        <a asp-controller="Class" asp-action="ClassList">Классы</a>
+    </li>
+    <li>
+        <a asp-controller="Account" asp-action="Register">Регистрация нового пользователя</a>
+    </li>
+    <li>
+        <a asp-controller="Admin" asp-action="ScheduleEdit">Управлять расписанием</a>
+    </li>
 </ul>

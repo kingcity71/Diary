@@ -6,6 +6,7 @@ namespace Diary.Interfaces
 {
     public interface IClassService
     {
+        void Update(ClassModel classModel);
         IEnumerable<ClassModel> GetClasses();
         ClassModel GetClassModel(Guid? id);
     }

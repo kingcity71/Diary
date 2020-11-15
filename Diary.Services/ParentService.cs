@@ -9,6 +9,13 @@ namespace Diary.Services
 {
     public partial class UserService
     {
+        public void Update(ParentModel parentModel)
+        {
+            var id = parentModel.Id;
+            _propertyValueService.Update(id, "ParentBirthDate", parentModel.BirthDate.ToString());
+            _propertyValueService.Update(id, "ParentName", parentModel.Name);
+
+        }
         private ParentModel GetParentModel(UserModel userModel)
         {
             var parentModel = _mapper.Map<UserModel, ParentModel>(userModel);

@@ -1,1 +1,30 @@
-﻿
+﻿@using Diary.Models;
+@model ParentModel;
+@{
+    ViewData["Title"] = "ParentEdit";
+}
+
+<h1>Страница редактирования данных родителя</h1>
+<form asp-action="ParentEdit" method="post">
+    @Html.HiddenFor(x => x.Id)
+    @Html.HiddenFor(x => x.Login)
+    <div class="row">
+        @Html.LabelFor(x => x.Login, "Логин")
+        @Html.TextBoxFor(x => x.Login, new { @class = "form-control", disabled = true })
+    </div>
+
+    <div class="row">
+        @Html.LabelFor(x => x.Name, "ФИО")
+        @Html.TextBoxFor(x => x.Name, new { @class = "form-control" })
+    </div>
+
+    <div class="row">
+        @Html.LabelFor(x => x.BirthDate, "Дата рождения (дд.мм.гггг)")
+        @Html.TextBoxFor(x => x.BirthDate, new { @class = "form-control" })
+    </div>
+    <button type="submit" class="btn btn-success">Сохранить</button>
+</form>
+<script>
+     if ('@ViewBag.IsInvalid' == 'True')
+        alert('Проверьте валидность данных')
+</script>

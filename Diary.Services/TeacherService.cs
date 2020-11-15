@@ -1,12 +1,18 @@
 ﻿using Diary.Models;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Diary.Services
 {
     public partial class UserService 
     {
+        public void Update(TeacherModel teacherModel)
+        {
+            var id = teacherModel.Id;
+            _propertyValueService.Update(id, "TeacherCareerStartDate", teacherModel.CareerStartDate.ToString());
+            _propertyValueService.Update(id, "TeacherEducationPlace", teacherModel.EducationPlace.ToString());
+            _propertyValueService.Update(id, "TeacherBirthDate", teacherModel.BirthDate.ToString());
+            _propertyValueService.Update(id, "TeacherName", teacherModel.Name);
+        }
         TeacherModel GetTeacherModel(UserModel userModel)
         {
             var model = _mapper.Map<UserModel, TeacherModel>(userModel);
