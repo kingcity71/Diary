@@ -11,7 +11,7 @@ namespace Diary.Services
     {
         private ParentModel GetParentModel(UserModel userModel)
         {
-            var parentModel = Map<UserModel, ParentModel>(userModel);
+            var parentModel = _mapper.Map<UserModel, ParentModel>(userModel);
 
             var childIds = _childParentsRepo.GetAllItems().Where(x => x.ParentId == userModel.Id).Select(x => x.ChildId).ToList();
 

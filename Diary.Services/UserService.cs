@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Diary.Entities;
+﻿using Diary.Entities;
 using Diary.Entities.Enums;
 using Diary.Interfaces;
 using Diary.Models;
@@ -7,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using IMapper = Diary.Interfaces.IMapper;
 
 namespace Diary.Services
 {
@@ -18,16 +18,18 @@ namespace Diary.Services
         private readonly IRepository<ClassStudentRelationship> _classStudRepo;
         private readonly IClassService _classService;
         private readonly IRepository<ChildParentRelationship> _childParentsRepo;
+        private readonly IMapper _mapper;
 
         public UserService(IRepository<User> userRepo, IPropertyValueService propertyValueService,
             IRepository<ClassStudentRelationship> classStudRepo, IClassService classService,
-            IRepository<ChildParentRelationship> childParentsRepo)
+            IRepository<ChildParentRelationship> childParentsRepo, IMapper mapper)
         {
             _userRepo = userRepo;
             _propertyValueService = propertyValueService;
             _classStudRepo = classStudRepo;
             _classService = classService;
             _childParentsRepo = childParentsRepo;
+            _mapper = mapper;
         }
         public string GetGeneratedLogin(string role)
         {
@@ -50,23 +52,10 @@ namespace Diary.Services
         public UserModel GetUser(Guid id)
         {
             var entity = _userRepo.GetItem(id);
-            var entityValues = _propertyValueService.GetUserPropertyValues(id);
-
-            var propName = $"{entity.UserRole.ToString()}Name";
-            var name = entityValues.ContainsKey(propName) ? entityValues[propName] : string.Empty;
-
-            return new UserModel
-            {
-                Id = entity.Id,
-                Login = entity.Login,
-                Role = entity.UserRole.ToString(),
-                Name = name
-            };
+            return GetUser(entity);
         }
-
-        public UserModel GetUser(string login)
+        private UserModel GetUser(User entity)
         {
-            var entity = _userRepo.GetAllItems().FirstOrDefault(en => en.Login.ToLower() == login.ToLower());
             var entityValues = _propertyValueService.GetUserPropertyValues(entity.Id);
 
             var propName = $"{entity.UserRole.ToString()}Name";
@@ -79,6 +68,11 @@ namespace Diary.Services
                 Role = entity.UserRole.ToString(),
                 Name = name
             };
+        }
+        public UserModel GetUser(string login)
+        {
+            var entity = _userRepo.GetAllItems().FirstOrDefault(en => en.Login.ToLower() == login.ToLower());
+            return GetUser(entity); ;
         }
 
         public void CreateUser(UserModel userModel)
@@ -102,12 +96,16 @@ namespace Diary.Services
             ? dtValue
             : DateTime.MinValue;
 
-       private T2 Map<T1,T2>(T1 source)
+        public IEnumerable<UserModel> GetAllUsers()
         {
-            var config = new MapperConfiguration(conf => conf.CreateMap<T1, T2>());
-            var mapper = new Mapper(config);
-            var result = mapper.Map<T1, T2>(source);
-            return result;
+            var models = _userRepo.GetAllItems()
+                .Select(GetUser)
+                .OrderBy(x=>x.Name)
+                .ToList();
+            return models;
         }
+
+        public IEnumerable<UserModel> SearchUsers(string key)
+            =>_propertyValueService.SearchUserIdByKey(key).Select(GetUser);
     }
 }

@@ -47,6 +47,7 @@ namespace Diary.WebApp
             services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
             services.AddScoped<IMessageRepository, MessageRepository>();
             services.AddScoped<IScoreRepository, ScoreRepository>();
+            services.AddScoped<IPropertyValueRepository, PropertyValueRepository>();
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IStudentService, UserService>();

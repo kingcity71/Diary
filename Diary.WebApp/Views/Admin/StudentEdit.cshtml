@@ -1,0 +1,94 @@
+﻿@using Diary.WebApp.Models;
+@model StudentDTO;
+@{
+    ViewData["Title"] = "StudentEdit";
+}
+
+<h1>Страница редактирования данных учащегося</h1>
+<form asp-action="StudentEdit" method="post">
+    @Html.HiddenFor(x => x.Id)
+    @Html.HiddenFor(x => x.Login)
+    <div class="row">
+        @Html.LabelFor(x => x.Login, "Логин")
+        @Html.TextBoxFor(x => x.Login, new { @class = "form-control", disabled = true })
+    </div>
+
+    <div class="row">
+        @Html.LabelFor(x => x.Name, "ФИО")
+        @Html.TextBoxFor(x => x.Name, new { @class = "form-control" })
+    </div>
+
+    <div class="row">
+        @Html.LabelFor(x => x.BirthDate, "Дата рождения (дд.мм.гггг)")
+        @Html.TextBoxFor(x => x.BirthDate, new { @class = "form-control" })
+    </div>
+
+    <div class="row">
+        @Html.LabelFor(x => x.Parent1Name, "Родитель 1")
+        @Html.HiddenFor(x => x.Parent1Id)
+        @Html.TextBoxFor(x => x.Parent1Name, new { @class = "form-control parent" })
+    </div>
+
+    <div class="row">
+        @Html.LabelFor(x => x.Parent2Name, "Родитель 2")
+        @Html.HiddenFor(x => x.Parent2Id)
+        @Html.TextBoxFor(x => x.Parent2Name, new { @class = "form-control parent" })
+    </div>
+
+    <div class="row">
+        @Html.LabelFor(x => x.ClassId, "Класс")
+        @Html.DropDownListFor(x => x.ClassId,
+            Model.Classes.Select(x => new SelectListItem() { Text = x.Value, Value = x.Key.ToString() }).ToList(),
+            new { @class = "form-control" })
+    </div>
+
+    @*    <div class="btn btn-primary" id="addParent">Добавить родителя</div>*@
+    <button type="submit" class="btn btn-success">Сохранить</button>
+</form>
+<style>
+    #search-results{
+        background-color:white;
+        position:absolute;
+        padding:3px 0;
+        border:1px solid black;
+        border-radius:3px;
+    }
+    .search-result-item:hover{
+        background-color:lightgray;
+        cursor:pointer;
+    }
+</style>
+
+<script>
+    $('.parent').on('keyup', function (event) {
+        $('#search-results').remove();
+        var el = $(event.currentTarget);
+        var position = el.offset();
+
+        var value = el.val();
+        if (value.length < 3) return;
+        console.log(value);
+        $.get('/admin/SearchParents?key=' + value, function (data) {
+            if (data.length === 0) return;
+            var html = '<div id="search-results">';
+            for (var i = 0; i < data.length; i++)
+                html += '<div class="search-result-item" onclick="setResult(this)" data-id="' + data[i].id + '">' + data[i].name + '</div>';
+            html += '</div>';
+            var newEl = $(html);
+            newEl.css("top", (position.top + 40) + "px");
+            newEl.css("left", position.left + "px");
+            newEl.insertAfter(el);
+        })
+    })
+
+    var setResult = function (ctx) {
+        var el = $(ctx);
+        el.parent('#search-results').prev().val(el.text());
+        el.parent('#search-results').prev().prev().val(el.data('id'));
+
+        $('#search-results').remove();
+    }
+
+    if ('@Model.IsInvalid' == 'True')
+        alert('Проверьте валидность данных')
+</script>

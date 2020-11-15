@@ -26,8 +26,8 @@ namespace Diary.WebApp.Controllers
                 var role = GetUserRole();
                 return RedirectToAction($"{role}Profile", "Profile");
             }
-                
-            return View();
+            else
+                return RedirectToAction("Index","Admin");
         }
 
         public IActionResult Privacy()

@@ -1,0 +1,25 @@
+﻿@using Diary.Models;
+@model IEnumerable<UserModel>;
+@{
+    ViewData["Title"] = "UserList";
+
+    var roleNameDictionart = new Dictionary<string, string>
+    {
+        { "Parent", "Родитель"},
+        { "Student", "Ученик"},
+        { "Teacher", "Учитель"}
+    };
+}
+
+<h1>Список пользователей</h1>
+
+@foreach(var userModel in Model)
+{
+    if (userModel.Role == "Admin") continue;
+    <div>
+        <a asp-controller="Admin" asp-action="@(userModel.Role)Edit" asp-route-id="@userModel.Id">
+            @userModel.Name (@roleNameDictionart[userModel.Role])
+        </a>
+    </div>
+}
+

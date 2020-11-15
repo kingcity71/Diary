@@ -13,7 +13,7 @@ namespace Diary.Data.Repository
     {
         public MessageRepository(IConfiguration configuration) : base(configuration){}
 
-        public async Task Create(Message message)
+        new public async Task Create(Message message)
         {
             using var ctx = new Context(_configuration);
             await ctx.Messages.AddAsync(message);

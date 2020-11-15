@@ -9,7 +9,7 @@ namespace Diary.Services
     {
         TeacherModel GetTeacherModel(UserModel userModel)
         {
-            var model = Map<UserModel, TeacherModel>(userModel);
+            var model = _mapper.Map<UserModel, TeacherModel>(userModel);
             var values = _propertyValueService.GetUserPropertyValues(userModel.Id);
 
             model.BirthDate = GetDate(values, "TeacherBirthDate");
