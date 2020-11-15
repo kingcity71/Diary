@@ -17,13 +17,17 @@
 <div>Дата Рождения : @Model.BirthDate.ToString("dd.MM.yyyy")</div>
 @if (Model.Children.Any())
 {
-    <div>
-        Дети :
+<div>
+    Дети :
+    <ul>
         @foreach (var idChildName in Model.Children)
         {
-            <a asp-controller="Profile" asp-action="StudentProfile" asp-route-id="@idChildName.Key">
-                @idChildName.Value
-            </a>
+            <li>
+                <a asp-controller="Profile" asp-action="StudentProfile" asp-route-id="@idChildName.Key">
+                    @idChildName.Value
+                </a>
+            </li>
         }
-    </div>
+    </ul>
+</div>
 }

@@ -1,0 +1,16 @@
+﻿@using Diary.Models;
+@model IEnumerable<ClassModel>;
+@{
+    ViewData["Title"] = "Список классов";
+}
+
+    <h1>Список классов</h1>
+@foreach(var cl in Model)
+{
+    <div>
+        <a asp-controller="Class" asp-action="Index" asp-route-id="@cl.Id">
+            Класс @cl.FullName
+        </a>
+    </div>
+}
+

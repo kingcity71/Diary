@@ -14,29 +14,34 @@ namespace Diary.Services
         private readonly IRepository<ClassStudentRelationship> _repoClassStudents;
         private readonly IRepository<User> _userRepo;
         private readonly IPropertyValueService _propValSer;
+        private readonly IMapper _mapper;
 
         public ClassService(IRepository<Class> repoClass, IRepository<ClassStudentRelationship> repoClassStudents,
-            IRepository<User> userRepo, IPropertyValueService propValSer)
+            IRepository<User> userRepo, IPropertyValueService propValSer, IMapper mapper)
         {
             _repoClass = repoClass;
             _repoClassStudents = repoClassStudents;
             _userRepo = userRepo;
             _propValSer = propValSer;
+            _mapper = mapper;
         }
-        public ClassModel GetClassModel(Guid? id)
+
+        public IEnumerable<ClassModel> GetClasses()
         {
-            if (id == null) return null;
-            var classEntity = _repoClass.GetItem(id.Value);
-            var classModel = Activator.CreateInstance<ClassModel>();
+            var entities = _repoClass.GetAllItems();
+            var models = entities.Select(entity => GetClassModel(entity))
+                .OrderBy(x => x.FullName);
+            return models;
+        }
+
+        private ClassModel GetClassModel(Class classEntity)
+        {
+            var classModel = _mapper.Map<Class, ClassModel>(classEntity);
             var studentIds = _repoClassStudents
                 .GetAllItems()
-                .Where(x => x.ClassId == id)
+                .Where(x => x.ClassId == classEntity.Id)
                 .Select(x => x.StudentId)
                 .ToList();
-
-            classModel.Id = id.Value;
-            classModel.Letter = classEntity.Letter;
-            classModel.Number = classEntity.Number;
 
             foreach (var studentId in studentIds)
             {
@@ -45,6 +50,12 @@ namespace Diary.Services
             }
 
             return classModel;
+        }
+        public ClassModel GetClassModel(Guid? id)
+        {
+            if (id == null) return null;
+            var classEntity = _repoClass.GetItem(id.Value);
+            return GetClassModel(classEntity);
         }
 
         private UserModel GetUser(Guid id)

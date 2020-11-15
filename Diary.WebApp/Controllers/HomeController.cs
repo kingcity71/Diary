@@ -11,43 +11,22 @@ using Diary.Entities.Enums;
 
 namespace Diary.WebApp.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly IConfiguration _options;
-        private readonly IRepository<User> repository;
-        private readonly RoleManager<IdentityRole> roleManager;
-
-        public HomeController(ILogger<HomeController> logger, 
-            IConfiguration options, IRepository<User> repository,
-            RoleManager<IdentityRole> roleManager)
-        {
-            _logger = logger;
-            _options = options;
-            this.repository = repository;
-            this.roleManager = roleManager;
-        }
-
-        [Authorize]
-        public IActionResult GetLogin()
-        {
-            return Ok($"Ваш логин {User.Identity.Name}");
-        }
-
-        [Authorize(Roles = "Admin")]
-        public IActionResult GetRole()
-        {
-            return Ok($"Ваша роль админ");
-        }
+        public HomeController(RoleManager<IdentityRole> roleManager)
+            :base(roleManager){ }
 
         public IActionResult Index()
         {
-            foreach(var item in typeof(UserRole).GetEnumNames())
+            if (!User.Identity.IsAuthenticated)
+                return RedirectToAction("Login", "Account");
+
+            if(!User.IsInRole("Admin"))
             {
-                roleManager.CreateAsync(new IdentityRole(item)).GetAwaiter().GetResult();
+                var role = GetUserRole();
+                return RedirectToAction($"{role}Profile", "Profile");
             }
-            var user = User.Identity;
-            var q = repository.GetAllItems();
+                
             return View();
         }
 

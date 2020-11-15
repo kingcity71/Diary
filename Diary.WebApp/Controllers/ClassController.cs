@@ -20,5 +20,11 @@ namespace Diary.WebApp.Controllers
             var classModel = _classService.GetClassModel(id);
             return View(classModel);
         }
+
+        public IActionResult ClassList()
+        {
+            var classes = _classService.GetClasses();
+            return View(classes);
+        }
     }
 }

@@ -25,11 +25,13 @@
 {
     <div>
         Родители :
-        @foreach (var parent in Model.Parents)
-        {
-            <span>
+        <ul>
+            @foreach (var parent in Model.Parents)
+            {
+            <li>
                 <a asp-controller="Profile" asp-action="ParentProfile" asp-route-id="@parent.Id">@parent.Name</a>
-            </span>
-        }
+            </li>
+            }
+        </ul>
     </div>
 }
