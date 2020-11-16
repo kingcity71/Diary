@@ -17,39 +17,54 @@
         cursor: pointer;
     }
 
-    .btn:hover{
-        cursor:pointer;
+    .btn:hover {
+        cursor: pointer;
     }
 </style>
 <h1>Управление уроком</h1>
-<input id="schedId" value ="@Model.Id" hidden />
-<input id="date" value ="@Model.DateTime.ToString()" hidden />
+
+<input id="schedId" value="@Model.Id" hidden />
+<input id="date" value="@Model.DateTime.ToString()" hidden />
+
 
 <h3>Урок @Model.DateTime.ToString("dd.MM.yyyy HH.mm")</h3>
-
-<label>Класс</label>
-<select id="classes">
-    @foreach (var cl in @Model.Classes)
-    {
-        <option value="@cl.Key" selected="@(cl.Key==Model.ClassId)">@cl.Value</option>
-    }
-</select>
-
-<label>Урок</label>
-<select id="subjects">
-    @foreach (var cl in @Model.Subjects)
-    {
-        <option value="@cl.Key" selected="@(cl.Key==Model.SubjectId)">@cl.Value</option>
-    }
-</select>
-
+<div class="row">
+    <label for="classes">Класс</label>
+    <select id="classes" class="form-control">
+        @foreach (var cl in @Model.Classes)
+        {
+            <option value="@cl.Key" selected="@(cl.Key==Model.ClassId)">@cl.Value</option>
+        }
+    </select>
+</div>
+<div class="row">
+    <label for="subjects">Урок</label>
+    <select id="subjects" class="form-control">
+        @foreach (var cl in @Model.Subjects)
+        {
+            <option value="@cl.Key" selected="@(cl.Key==Model.SubjectId)">@cl.Value</option>
+        }
+    </select>
+</div>
 <div class="row">
     @Html.LabelFor(x => x.TeacherName, "Учитель")
     <input class="form-control teacher" id="teacher" data-id="@Model.TeacherId" value="@Model.TeacherName" />
 </div>
 
-<div class="btn btn-success" id="btnSave">
-    Сохранить
+<div class="row m-5">
+    <div class="col-lg-4">
+        <div class="btn btn-success" id="btnSave">
+            Сохранить
+        </div>
+    </div>
+    @if (Model.Id != Guid.Empty)
+    {
+        <div class="col-lg-4">
+            <div class="btn btn-danger" id="btnCancel">
+                Отменить
+            </div>
+        </div>
+    }
 </div>
 
 <script>
@@ -59,24 +74,34 @@
         var classId = $('#classes').val();
         var subjectId = $('#subjects').val();
         var teacherId = $('#teacher').data('id');
-        
-        var data = { schedId, date, classId, subjectId, teacherId };
+        var teacherName = $('#teacher').val();
+
+        var data = { schedId, date, classId, subjectId, teacherId, teacherName };
 
         $.ajax({
             type: "POST",
             url: "/admin/LessonEdit",
             data: {lessonDto:data},
             success: function (response) {
-                window.location.href = 'index/';
-                if (!response.item1)
-                    alert(response.item2)
-                else
-                    alert(response.item2)
+                if (response === true) {
+                    alert('Успешно сохранено!');
+                    window.location.href = "/admin/index";
+                }
+                else {
+                    alert('Проверьте данные!');
+                }
             },
             dataType: "json"
         });
-        
+
     });
+
+    $('#btnCancel').on('click', function () {
+        $.get('/admin/DeleteSchedule?id='+$('#schedId').val(), function () {
+            alert('Успешно удалено!');
+            window.location.href = "/admin/index";
+        })
+    })
 
     $('.teacher').on('keyup', function (event) {
         $('#search-results').remove();
@@ -107,6 +132,4 @@
         $('#search-results').remove();
     }
 
-    if ('@ViewBag.IsInvalid' == 'True')
-        alert('Проверьте валидность данных')
 </script>

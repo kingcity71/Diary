@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Diary.WebApp.Controllers
 {
@@ -228,10 +227,11 @@ namespace Diary.WebApp.Controllers
         }
 
         [HttpPost] 
-        public IActionResult LessonEdit(LessonEditDto lessonDto)
+        public bool LessonEdit(LessonEditDto lessonDto)
         {
             if(lessonDto.classId==Guid.Empty 
                 || !DateTime.TryParse(lessonDto.date, out var date)
+                || string.IsNullOrEmpty(lessonDto.teacherName)
                 || lessonDto.teacherId == Guid.Empty
                 || lessonDto.subjectId == Guid.Empty)
             {
@@ -250,7 +250,7 @@ namespace Diary.WebApp.Controllers
                 viewModel.Id = lessonDto.schedId;
 
                 ViewBag.IsInvalid = true;
-                return View(viewModel);
+                return false;
             }
 
             var schedModel = Activator.CreateInstance<ScheduleModel>();
@@ -262,7 +262,13 @@ namespace Diary.WebApp.Controllers
 
             _scheduleService.UpdateSchedule(schedModel);
 
-            return RedirectToAction("Index","Admin");
+            return true;
+        }
+
+        public bool DeleteSchedule(Guid id)
+        {
+            _scheduleService.DeleteSchedule(id);
+            return true;
         }
     }
 }

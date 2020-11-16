@@ -12,6 +12,6 @@ namespace Diary.Interfaces
         ScheduleModel GetSchedule(Guid id);
      
         void UpdateSchedule(ScheduleModel model);
-        void DeleteSchedule(ScheduleModel model);
+        void DeleteSchedule(Guid id);
     }
 }

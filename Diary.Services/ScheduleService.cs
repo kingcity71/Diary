@@ -38,11 +38,7 @@ namespace Diary.Services
             return models;
         }
         
-
-        public void DeleteSchedule(ScheduleModel model)
-        {
-            throw new NotImplementedException();
-        }
+        public void DeleteSchedule(Guid id) => _repoSched.Delete(id);
 
         public ScheduleModel GetSchedule(Guid id)
         {
