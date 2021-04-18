@@ -16,7 +16,7 @@ namespace Diary.Data.Repository
         {
             _configuration = configuration;
         }
-        public void Create(T item)
+        public virtual void Create(T item)
         {
             using var ctx = new Context(_configuration);
             ctx.Add(item);

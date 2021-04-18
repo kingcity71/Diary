@@ -25,6 +25,20 @@ namespace Diary.WebApp.Controllers
             _scoreService = scoreService;
         }
 
+        [HttpGet("Schedule/Bind/{scheduleId}/{fileId}")]
+        public IActionResult Bind(Guid scheduleId, Guid fileId)
+        {
+            try
+            {
+                _scheduleService.BindLessonWithFile(scheduleId, fileId);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex);
+            }
+            return Ok();
+        }
+
         [HttpGet("Schedule/Index")]
         public IActionResult Index()
             => View(new MonthScheduleViewModel(DateTime.Now.Month, DateTime.Now.Year));

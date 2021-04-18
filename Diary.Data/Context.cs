@@ -29,8 +29,9 @@ namespace Diary.Data
         public DbSet<Schedule> Schedules { get; set; }
 
         public DbSet<Subject> Subjects { get; set; }
-
+        public DbSet<File> Files { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<LessonFile> LessonFiles { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

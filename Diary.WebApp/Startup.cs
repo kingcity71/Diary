@@ -48,6 +48,8 @@ namespace Diary.WebApp
             services.AddScoped<IMessageRepository, MessageRepository>();
             services.AddScoped<IScoreRepository, ScoreRepository>();
             services.AddScoped<IPropertyValueRepository, PropertyValueRepository>();
+            services.AddScoped<IFileRepository, FileRepository>();
+            services.AddScoped<ILessonFileRepository, LessonFileRepository>();
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IStudentService, UserService>();
@@ -56,6 +58,8 @@ namespace Diary.WebApp
             services.AddScoped<IPropertyValueService, PropertyValueService>();
             services.AddScoped<IMessageService, MessageService>();
             services.AddScoped<IScoreService, ScoreService>();
+
+            services.AddScoped<IFileService, FileService>();
 
             services.AddScoped<IClassService, ClassService>();
             services.AddScoped<IScheduleService, ScheduleService>();

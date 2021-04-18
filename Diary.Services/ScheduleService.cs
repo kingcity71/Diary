@@ -13,22 +13,36 @@ namespace Diary.Services
         private readonly IRepository<Schedule> _repoSched;
         private readonly IRepository<Subject> _repoSubject;
         private readonly IRepository<ClassStudentRelationship> _repoClassStudentRelationship;
+        private readonly ILessonFileRepository lessonFileRepository;
         private readonly IUserService _userService;
         private readonly IScoreService _scoreService;
         private readonly IClassService _classService;
 
         public ScheduleService(IRepository<Schedule> repoSched, IRepository<Subject> repoSubject,
-            IRepository<ClassStudentRelationship> repoClassStudentRelationship, IUserService userService, IClassService classService,
+            IRepository<ClassStudentRelationship> repoClassStudentRelationship, 
+            ILessonFileRepository lessonFileRepository,
+            IUserService userService, 
+            IClassService classService,
             IScoreService scoreService)
         {
             _repoSched = repoSched;
             _repoSubject = repoSubject;
             _repoClassStudentRelationship = repoClassStudentRelationship;
-
+            this.lessonFileRepository = lessonFileRepository;
             _userService = userService;
             _scoreService = scoreService;
             _classService = classService;
         }
+        public void BindLessonWithFile(Guid scheduleId, Guid fileId)
+        {
+            lessonFileRepository.Create(new LessonFile
+            {
+                FileId = fileId,
+                ScheduleId = scheduleId
+            });
+        }
+        public IEnumerable<Guid> GetLessonFiles(Guid scheduleId)
+            => lessonFileRepository.GetFileIdsBySchedueId(scheduleId);
         public IEnumerable<ScheduleModel> ScheduleSearch(DateTime date, Guid classId)
         {
             var models = _repoSched.GetAllItems()
@@ -137,6 +151,7 @@ namespace Diary.Services
             
             lessonModel.ScheduleInfo = GetSchedule(schedId);
             lessonModel.Scores = _scoreService.GetScoreModels(schedId);
+            lessonModel.Files = GetLessonFiles(schedId).ToArray();
             return lessonModel;
         }
     }

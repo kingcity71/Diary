@@ -1,0 +1,28 @@
+﻿@model Microsoft.AspNetCore.Http.IFormCollection;
+<form asp-controller="File" asp-action="Upload" 
+      method="post" autocomplete="off" enctype="multipart/form-data">
+    <input type="file" name="file">
+    <input type="submit" title="OK"/>
+</form>
+
+<a 
+   href="http://localhost:60125/File/Download?id=03B396A6-8533-4A8F-F26A-08D90261EAB3"
+   target="_blank"
+   download>
+    <button id="do2wnload">DOWNLOAD</button>
+</a>
+
+<script>
+    $('#download').on('click', function () {
+        $.get('http://localhost:60125/File/Download?id=03B396A6-8533-4A8F-F26A-08D90261EAB3', function (data)
+        {
+            var blob = new Blob([data]);
+            var link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = "myFileName.docx";
+            link.click();
+            //debugger;
+            //data;
+        });
+    })
+</script>

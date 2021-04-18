@@ -6,6 +6,8 @@ namespace Diary.Interfaces
 {
     public interface IScheduleService
     {
+        void BindLessonWithFile(Guid scheduleId, Guid fileId);
+        IEnumerable<Guid> GetLessonFiles(Guid scheduleId);
         IEnumerable<ScheduleModel> ScheduleSearch(DateTime date, Guid classId);
         LessonModel GetLesson(Guid schedId);
         IEnumerable<ScheduleModel> GetSchedulesByDay(DateTime day, string role, Guid? entityId = null, Guid? childId = null);

@@ -16,8 +16,16 @@
 }
 @Html.HiddenFor(x => x.ScheduleInfo.Id)
 <style>
-    .btn:hover{
-        cursor:pointer;
+    .btn:hover {
+        cursor: pointer;
+    }
+
+    visible {
+        display: block;
+    }
+
+    hidden {
+        display: none;
     }
 </style>
 
@@ -25,6 +33,34 @@
 <h4>Преподает @Model.ScheduleInfo.Teacher.Name</h4>
 <h4>Время @Model.ScheduleInfo.Date.ToString("HH.mm")</h4>
 
+<hr />
+@if (hasPermission)
+{
+    <span>Загрузить материалы занятия</span>
+    <input type="file" id="lessonFileUpload">
+}
+<div id="files" class="@(Model.Files?.Any() == true?"visible":"hidden")">
+
+
+    <hr />
+    <h4>Материалы занятия</h4>
+    <ul id="filesList">
+        @for (var i = 0; i < Model.Files.Count(); i++)
+        {
+            var id = Model.Files[i];
+            <li>
+                <a href="http://localhost:60125/File/Download?id=@(id)"
+                   target="_blank"
+                   data-id="@id"
+                   download>
+                    Скачать файл @(i + 1)
+                </a>
+            </li>
+        }
+    </ul>
+    <hr />
+
+</div>
 <br />
 <div class="row m-1">
     <div class="col-lg-10 text-center"><h3> Оценки за урок</h3></div>
@@ -77,10 +113,41 @@
 }
 
 <script>
+    $('#lessonFileUpload').on('change', function (event) {
+        let file = $(this).prop('files')[0];
+        let formData = new FormData();
+        formData.append('file', file)
+        $.ajax(
+            {
+                url: "/File/Upload",
+                data: formData,
+                processData: false,
+                contentType: false,
+                type: "POST",
+                success: function (data) {
+                    let fileId = data;
+                    let scheduleId = $('#ScheduleInfo_Id').val();
+
+                    $.get(`/schedule/bind/${scheduleId}/${fileId}`, function () {
+                        $('#files').removeClass("hidden");
+                        $('#files').addClass("visible");
+                        let li = '<a href="http://localhost:60125/File/Download?id=' + fileId + '"'
+                            + ' target="_blank" '
+                            + ` data-id="${data}"`
+                            + 'download>'
+                            + 'Новый файл</a>';
+                        $('#filesList').append(li);
+
+                        alert("Файл Успешно Загружен!");
+                    })
+                }
+            }
+        );
+    });
     $('#btn-save').on('click', function () {
         var data = [];
         var SchedId = $('#ScheduleInfo_Id').val();
-        
+
         var lines = $('.student-line');
         for (var i = 0; i < lines.length; i++) {
             var line = $(lines[i]);
@@ -94,7 +161,7 @@
             });
         }
 
-        
+
         $.ajax({
             type: "POST",
             url: "/schedule/UpdateScores",
