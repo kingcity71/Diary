@@ -1,12 +1,96 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿<style>
+    .hidden{
+        display:none;
+    }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    .content-header {
+        margin: 5px 0;
+        height: 70px;
+        padding: 10px 0;
+        text-align: center;
+    }
+    .content-header-title {
+        font-size:20px;
+    }
+    .content-header-subtitle{
+        font-size:15px;
+    }
+    .content-header,
+    .menu-item,
+    .content-item {
+        width: 100%;
+        border: 1px solid gray;
+        border-radius: 3px;
+    }
+
+    .menu-item {
+        margin:3px 0;
+        height: 50px;
+        padding: 10px 0;
+        text-align: center;
+    }
+
+        .menu-item:hover {
+            box-shadow: rgba(0,0,0,0.5) 0px 0px 5px;
+            
+            cursor: pointer;
+            //background: rgb(128, 128, 128);
+        }
+
+    .menu-item-selected {
+        background: rgb(237, 234, 234);
+    }
+</style>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="content-header">
+                <div class="content-header-title">История, 9:00</div>
+                <div class="content-header-subtitle">
+                    <a href="#">
+                        Максим Анатольевич Коржевский
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-2">
+            <div class="menu">
+                <div class="menu-item menu-item-selected " data-num="0">
+                    Item1
+                </div>
+                <div class="menu-item" data-num="1">
+                    Item2
+                </div>
+            </div>
+        </div>
+        <div class="col-10">
+            <div class="content">
+                <div class="content-item" data-num="0">
+                    Content1
+                </div>
+                <div class="content-item hidden" data-num="1">
+                    Content2
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <script>
-        
-       
+    function hideAll() {
+        $('.content-item').each((index,el) => $(el).hide());
+    }
+    function unselectAll() {
+        $('.menu-item').each((index, el) => $(el).removeClass('menu-item-selected'));
+    }
+    $('.menu-item').on('click', function () {
+        hideAll();
+        unselectAll();
+        let el = $(this);
+        let target = $('.content-item').filter((index, elem) => $(elem).data('num') == el.data('num'))[0];
+        $(target).show();
+        el.addClass('menu-item-selected');
+    });
 </script>

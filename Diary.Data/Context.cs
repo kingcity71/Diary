@@ -14,6 +14,12 @@ namespace Diary.Data
             _connectionString = configuration.GetConnectionString(SQL_CONNECTION_CONFIG_NAME);
         }
 
+        public DbSet<SpecialTask> SpecialTasks { get; set; }
+        public DbSet<SpecialTaskFile> SpecialTaskFiles { get; set; }
+        public DbSet<SpecialTaskAnswer> SpecialTaskAnswers { get; set; }
+        public DbSet<SpecialTaskAnswerFile> SpecialTaskAnswerFiles { get; set; }
+        public DbSet<SpecialTaskAnswerScore> SpecialTaskAnswerScores { get; set; }
+        
         public DbSet<Score> Scores { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<ChildParentRelationship> ChildParents { get; set; }

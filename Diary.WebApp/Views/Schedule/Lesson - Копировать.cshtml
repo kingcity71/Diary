@@ -1,0 +1,264 @@
+﻿@using Diary.Models;
+@using Diary.Models.Enums;
+@model LessonModel;
+@{
+    ViewData["Title"] = "Страница Урока";
+    var scoreMapper = new Dictionary<ScoreResult, string>
+{
+        {ScoreResult.None, "Н" },
+        {ScoreResult.Two, ((int)ScoreResult.Two).ToString() },
+        {ScoreResult.Three, ((int)ScoreResult.Three).ToString() },
+        {ScoreResult.Four, ((int)ScoreResult.Four).ToString() },
+        {ScoreResult.Five, ((int)ScoreResult.Five).ToString() }
+    };
+
+    var hasPermission = User.IsInRole("Admin") || User.IsInRole("Teacher");
+
+    string GetSpecialTaskName(SpecialTaskType type)
+    {
+        switch (type)
+        {
+            case SpecialTaskType.Exam:
+                return "Экзамен";
+            case SpecialTaskType.HomeWork:
+                return "Домашная работа";
+            case SpecialTaskType.Lab:
+                return "Лабораторная работа";
+            case SpecialTaskType.Test:
+                return "Контрольная работа";
+            default:
+                return string.Empty;
+        }
+    }
+}
+@Html.HiddenFor(x => x.ScheduleInfo.Id)
+<style>
+
+    .btn:hover {
+        cursor: pointer;
+    }
+
+    .visible {
+        display: block;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .opener {
+        font-size: 30px;
+    }
+
+        .opener:hover {
+            cursor: pointer;
+        }
+</style>
+
+<h3>Урок @Model.ScheduleInfo.Subject</h3>
+<h4>Преподает @Model.ScheduleInfo.Teacher.Name</h4>
+<h4>Время @Model.ScheduleInfo.Date.ToString("HH.mm")</h4>
+
+<hr />
+
+<div id="files" class="@(Model.Files?.Any() == true?"visible":"hidden")">
+    <h4 class="text-center">Материалы занятия <span class="opener">+</span></h4>
+    <div class="hidden">
+        <div>Список файлов</div>
+        <ul id="filesList">
+            @for (var i = 0; i < Model.Files.Count(); i++)
+            {
+                var id = Model.Files[i];
+                <li>
+                    <a href="http://localhost:60125/File/Download?id=@(id)"
+                       target="_blank"
+                       data-id="@id"
+                       download>
+                        Скачать файл @(i + 1)
+                    </a>
+                </li>
+            }
+        </ul>
+        @if (hasPermission)
+        {
+            <input type="file" id="lessonFileUpload">
+        }
+    </div>
+    <hr />
+</div>
+
+@if (hasPermission)
+{
+    <h4 class="text-center">Добавить задание <span class="opener">+</span></h4>
+    <div class="row m-1 hidden">
+        <div class="col-lg-3"></div>
+        <div class="col-lg-6">
+            <label for="specialTaskTypeSelect"></label>
+            <select class="form-control" id="specialTaskTypeSelect">
+                <option selected>Выберите тип задания</option>
+                <option value="0">Домашнее задание</option>
+                <option value="1">Контрольная работа</option>
+                <option value="2">Лабораторная работа</option>
+                <option value="3">Экзамен</option>
+            </select>
+        </div>
+        <div class="col-lg-3"></div>
+
+        <div class="col-lg-2"></div>
+        <div class="col-lg-8">
+            <label for="specialTaskDescription">Описание</label>
+            <textarea class="form-control" id="specialTaskDescription"></textarea>
+        </div>
+        <div class="col-lg-2">
+            <div class="btn btn-success" id="addTask">
+                OK
+            </div>
+        </div>
+    </div>
+
+    <hr />
+}
+@foreach (var specialTask in Model.SpecialTasks)
+{
+    var specialTaskName = GetSpecialTaskName(specialTask.SpecialTaskType);
+    <div>@specialTaskName</div>
+    <div>Описание : @specialTask.Description</div>
+    <div>
+        Файл : <a href="http://localhost:60125/File/Download?id=@(specialTask.FileId)"
+                      target="_blank"
+                      data-id="@specialTask.FileId"
+                      download>
+            Скачать файл
+        </a>
+    </div>
+
+}
+
+<div class="row m-1">
+    <div class="col-lg-10 text-center"><h3> Активность на уроке</h3></div>
+    <div class="col-lg-2">
+        @if (hasPermission)
+        {
+            <div class="btn btn-success" id="btn-save">
+                Сохранить
+            </div>
+        }
+    </div>
+</div>
+<div class="row m-1">
+    <div class="col-lg-4">
+        ФИО
+    </div>
+    <div class="col-lg-4">
+        Оценка
+    </div>
+    <div class="col-lg-4">
+        Комментарий
+    </div>
+</div>
+
+@foreach (var student in Model.ScheduleInfo.Class.Students)
+{
+
+    <div class="row m-1 student-line" data-id="@student.Id">
+        <div class="col-lg-4">
+            @student.Name
+        </div>
+        <div class="col-lg-4">
+            @{
+                var score = Model.Scores.FirstOrDefault(x => x.StudentModel.Id == student.Id);
+                <select class="form-control w-100 score-select" data-id="@(score != null ? score.Id : Guid.Empty)" disabled="@(!hasPermission)">
+                    <option selected="@(score == null)">Выберите</option>
+                    @foreach (var scoreMap in scoreMapper)
+                    {
+                        <option value="@scoreMap.Key"
+                                selected="@(score!=null && scoreMap.Key == score.ScoreResult)">
+                            @scoreMap.Value
+                        </option>
+                    }
+                </select>
+            }
+        </div>
+        <div class="col-lg-4">
+            <input class="form-control w-100 score-comment" value="@score?.Comment" readonly="@(!hasPermission)">
+        </div>
+    </div>
+}
+
+<script>
+    $('.opener').on('click', function (event) {
+        let el = $(this);
+        if (el.text() == '+') {
+            el.parent().next().slideDown();
+            el.text('-');
+        }
+        else {
+            el.parent().next().slideUp();
+            el.text('+');
+        }
+    });
+
+    $('#lessonFileUpload').on('change', function (event) {
+        let file = $(this).prop('files')[0];
+        let formData = new FormData();
+        formData.append('file', file)
+        $.ajax(
+            {
+                url: "/File/Upload",
+                data: formData,
+                processData: false,
+                contentType: false,
+                type: "POST",
+                success: function (data) {
+                    let fileId = data;
+                    let scheduleId = $('#ScheduleInfo_Id').val();
+
+                    $.get(`/schedule/bind/${scheduleId}/${fileId}`, function () {
+                        $('#files').removeClass("hidden");
+                        $('#files').addClass("visible");
+                        let li = '<a href="http://localhost:60125/File/Download?id=' + fileId + '"'
+                            + ' target="_blank" '
+                            + ` data-id="${data}"`
+                            + 'download>'
+                            + 'Новый файл</a>';
+                        $('#filesList').append(li);
+
+                        alert("Файл Успешно Загружен!");
+                        location.reload();
+                    })
+                }
+            }
+        );
+    });
+    $('#btn-save').on('click', function () {
+        var data = [];
+        var SchedId = $('#ScheduleInfo_Id').val();
+
+        var lines = $('.student-line');
+        for (var i = 0; i < lines.length; i++) {
+            var line = $(lines[i]);
+            var scoreSelect = $(line.find('.score-select')[0]);
+            var StudentId = line.data('id');
+            var ScoreType = scoreSelect.val();
+            var ScoreId = scoreSelect.data('id');
+            var ScoreComment = $(line.find('.score-comment')[0]).val();
+            data.push({
+                SchedId, ScoreComment, ScoreId, StudentId, ScoreType
+            });
+        }
+
+
+        $.ajax({
+            type: "POST",
+            url: "/schedule/UpdateScores",
+            data: { scores: data },
+            success: function (response) {
+                if (!response.item1)
+                    alert(response.item2)
+                else
+                    alert(response.item2)
+            },
+            dataType: "json"
+        });
+    });
+</script>

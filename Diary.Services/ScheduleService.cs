@@ -16,6 +16,7 @@ namespace Diary.Services
         private readonly ILessonFileRepository lessonFileRepository;
         private readonly IUserService _userService;
         private readonly IScoreService _scoreService;
+        private readonly ISpecialTaskService specialTaskService;
         private readonly IClassService _classService;
 
         public ScheduleService(IRepository<Schedule> repoSched, IRepository<Subject> repoSubject,
@@ -23,7 +24,8 @@ namespace Diary.Services
             ILessonFileRepository lessonFileRepository,
             IUserService userService, 
             IClassService classService,
-            IScoreService scoreService)
+            IScoreService scoreService,
+            ISpecialTaskService specialTaskService)
         {
             _repoSched = repoSched;
             _repoSubject = repoSubject;
@@ -31,6 +33,7 @@ namespace Diary.Services
             this.lessonFileRepository = lessonFileRepository;
             _userService = userService;
             _scoreService = scoreService;
+            this.specialTaskService = specialTaskService;
             _classService = classService;
         }
         public void BindLessonWithFile(Guid scheduleId, Guid fileId)
@@ -148,10 +151,12 @@ namespace Diary.Services
         {
             var lessonModel = Activator.CreateInstance<LessonModel>();
             if (schedId == Guid.Empty) return lessonModel;
-            
+
             lessonModel.ScheduleInfo = GetSchedule(schedId);
             lessonModel.Scores = _scoreService.GetScoreModels(schedId);
             lessonModel.Files = GetLessonFiles(schedId).ToArray();
+            lessonModel.SpecialTasks = specialTaskService.GetSpecialTasks(schedId);
+
             return lessonModel;
         }
     }

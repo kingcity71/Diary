@@ -6,23 +6,41 @@ using Diary.Models;
 using Diary.WebApp.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 
 namespace Diary.WebApp.Controllers
 {
     public class ScheduleController : BaseController
     {
         private readonly IScheduleService _scheduleService;
-        
+        private readonly ISpecialTaskService specialTaskService;
         private readonly IUserService _userService;
         private readonly IScoreService _scoreService;
 
-        public ScheduleController(IScheduleService scheduleService, RoleManager<IdentityRole> roleManager, 
+        public ScheduleController(IScheduleService scheduleService,
+            ISpecialTaskService specialTaskService,
+            RoleManager<IdentityRole> roleManager, 
             IUserService userService, IScoreService scoreService)
             : base(roleManager)
         {
             _scheduleService = scheduleService;
+            this.specialTaskService = specialTaskService;
             _userService = userService;
             _scoreService = scoreService;
+        }
+
+        [HttpPost("Schedule/UploadSpecialTask")]
+        public IActionResult SpecialTaskUpload(SpecialTask specialTask)
+        {
+            try
+            {
+                specialTaskService.Create(specialTask);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex);
+            }
+            return Ok();
         }
 
         [HttpGet("Schedule/Bind/{scheduleId}/{fileId}")]
