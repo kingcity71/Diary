@@ -24,7 +24,6 @@ namespace Diary.WebApp.Controllers
         {
             return View();
         }
-
         [HttpPost]
         public IActionResult Upload(IFormFile file)
         {
@@ -39,7 +38,6 @@ namespace Diary.WebApp.Controllers
             }
             return Ok(fileId);
         }
-
         [HttpGet]
         public IActionResult Download(Guid id)
         {
@@ -49,7 +47,6 @@ namespace Diary.WebApp.Controllers
             var contentType = GetContentType(fileName);
             return File(content, contentType, fileName);
         }
-
         string GetContentType(string fileName)
         {
             var contentTypes = configuration

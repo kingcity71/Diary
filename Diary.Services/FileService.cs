@@ -1,5 +1,4 @@
-﻿using Diary.Entities;
-using Diary.Interfaces;
+﻿using Diary.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -37,6 +36,17 @@ namespace Diary.Services
             fileRepo.Create(new FileEntity {Id = id, FileName = fileName });
             var fileEntity  = fileRepo.GetItem(fileName); ;
             return fileEntity;
+        }
+        public void Delete(Guid id)
+        {
+            var file = fileRepo.GetItem(id);
+            var fullPath = _path + file.FileName;
+            try
+            {
+                System.IO.File.Delete(fullPath);
+            }
+            catch { }
+            fileRepo.Delete(id);
         }
     }
 }

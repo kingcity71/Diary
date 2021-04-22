@@ -42,7 +42,19 @@ namespace Diary.WebApp.Controllers
             }
             return Ok();
         }
-
+        [HttpDelete("Schedule/DeleteSpecialTask")]
+        public IActionResult DeleteSpecialTask(Guid id)
+        {
+            try
+            {
+                specialTaskService.Delete(id);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex);
+            }
+            return Ok();
+        }
         [HttpGet("Schedule/Bind/{scheduleId}/{fileId}")]
         public IActionResult Bind(Guid scheduleId, Guid fileId)
         {

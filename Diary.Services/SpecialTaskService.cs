@@ -12,12 +12,15 @@ namespace Diary.Services
     public class SpecialTaskService : ISpecialTaskService
     {
         private readonly ISpecialTaskRepository repo;
+        private readonly IFileService fileService;
         private readonly IRepository<SpecialTaskFile> spfRepo;
 
         public SpecialTaskService(ISpecialTaskRepository repo,
+            IFileService fileService,
             IRepository<SpecialTaskFile> spfRepo)
         {
             this.repo = repo;
+            this.fileService = fileService;
             this.spfRepo = spfRepo;
         }
         public void Create(Models.SpecialTask st)
@@ -56,6 +59,17 @@ namespace Diary.Services
             }
 
             return list;
+        }
+
+
+        public void Delete(Guid id)
+        {
+            var spf = spfRepo.GetItem(x => x.SpecialTaskId == id);
+            fileService.Delete(spf.FileId);
+
+            spfRepo.Delete(spf.Id);
+            repo.Delete(id);
+            
         }
 
         Models.SpecialTask MapEntityToModel(SpecialTaskEntity st)

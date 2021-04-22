@@ -1,4 +1,5 @@
 ﻿using Diary.Entities;
+using System;
 
 namespace Diary.Interfaces
 {

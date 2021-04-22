@@ -77,6 +77,10 @@
     .menu-item-selected {
         background: rgb(237, 234, 234);
     }
+
+    .hoverx:hover {
+        cursor: pointer !important;
+    }
 </style>
 
 <div class="container">
@@ -118,7 +122,7 @@
                         <div class="col-lg-2">
                             @if (hasPermission)
                             {
-                                <div class="btn btn-success" id="btn-save">
+                                <div class="hoverx btn btn-success" id="btn-save">
                                     Сохранить
                                 </div>
                             }
@@ -185,6 +189,10 @@
                     }
                 </div>
                 <div class="content-item hidden" data-num="2">
+                    @if (!Model.SpecialTasks.Any())
+                    {
+                        <div class="text-center">Список заданий пуст</div>
+                    }
                     @foreach (var specialTask in Model.SpecialTasks)
                     {
                         var specialTaskName = GetSpecialTaskName(specialTask.SpecialTaskType);
@@ -199,7 +207,10 @@
                                 Скачать файл
                             </a>
                         </div>
-
+                        <div class="btn btn-danger hoverx deleteSP" data-id="@specialTask.Id">
+                            Удалить
+                        </div>
+                        <hr />
                     }
                 </div>
                 <div class="content-item hidden" data-num="3">
@@ -223,7 +234,7 @@
                             <textarea class="form-control" id="specialTaskDescription"></textarea>
                         </div>
                         <div class="col-lg-2">
-                            <div class="btn btn-success" id="addTask">
+                            <div class="btn btn-success hoverx" id="addTask">
                                 OK
                             </div>
                         </div>
@@ -237,8 +248,8 @@
 </div>
 <script>
     $('#addTask').on('click', function () {
-        let uploadTask = function (fileId){
-            
+        let uploadTask = function (fileId) {
+
             let FileId = fileId;
             let ScheduleId = $('#ScheduleInfo_Id').val();
             let SpecialTaskType = $('#specialTaskTypeSelect').val();
@@ -252,11 +263,18 @@
 
                 type: "POST",
                 dataType: "json",
-
-                success: function () {
+                success: function (data) {
+                    debugger;
                     alert("Успешно!");
                     location.reload();
+                },
+                statusCode: {
+                    200: function () {
+                        alert("Успешно!");
+                        location.reload();
+                    }
                 }
+
             })
         }
 
@@ -354,4 +372,21 @@
             dataType: "json"
         });
     });
+
+    $('.deleteSP').on('click', function () {
+        if (!confirm("Удалить?")) return;
+        let id = $(this).data('id');
+        $.ajax({
+            type: "DELETE",
+            url: "/schedule/deleteSpecialTask",
+            dataType: "json",
+            statusCode: {
+                200: function () {
+                    alert("Успешно!");
+                    location.reload();
+                }
+            },
+            data: { id: id }
+        })
+    })
 </script>

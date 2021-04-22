@@ -13,6 +13,7 @@ namespace Diary.Data.Repository
         public SpecialTaskRepository(IConfiguration configuration) : base(configuration)
         {
         }
+
         public SpecialTask CreateItem(SpecialTask item)
         {
             using var ctx = new Context(_configuration);
