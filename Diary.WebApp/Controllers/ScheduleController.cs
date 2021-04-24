@@ -29,6 +29,48 @@ namespace Diary.WebApp.Controllers
             _scoreService = scoreService;
         }
 
+        [HttpDelete("Schedule/DeleteSpecialTaskFile")]
+        public IActionResult DeleteSpecialTaskFile(Guid spId)
+        {
+            try
+            {
+                specialTaskService.DeleteFile(spId);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+            return Ok();
+        }
+
+        [HttpPatch("Schedule/UpdateSpecialTaskFile")]
+        public IActionResult UpdateSpecialTaskFile(Guid spId, Guid newFileId)
+        {
+            try
+            {
+                specialTaskService.UpdateFile(spId, newFileId);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+            return Ok();
+        }
+
+        [HttpPost("Schedule/UpdateSpecialTask")]
+        public IActionResult UpdateSpecialTask(SpecialTask specialTask)
+        {
+            try
+            {
+                specialTaskService.Update(specialTask);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+            return Ok();
+        }
+
         [HttpPost("Schedule/UploadSpecialTask")]
         public IActionResult SpecialTaskUpload(SpecialTask specialTask)
         {

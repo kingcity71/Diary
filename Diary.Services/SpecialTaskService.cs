@@ -23,6 +23,46 @@ namespace Diary.Services
             this.fileService = fileService;
             this.spfRepo = spfRepo;
         }
+
+        public void DeleteFile(Guid id)
+        {
+            var spf = spfRepo.GetItem(x => x.SpecialTaskId == id);
+            try { fileService.Delete(spf.FileId); }
+            catch { }
+            spfRepo.Delete(spf.Id);
+        }
+        public void UpdateFile(Guid spId, Guid newFileId)
+        {
+            var spf = spfRepo.GetItem(x => x.SpecialTaskId == spId);
+            if (spf != null)
+            {
+                fileService.Delete(spf.FileId);
+                spf.FileId = newFileId;
+                spfRepo.Update(spf);
+            }
+            else
+            {
+                spf = new SpecialTaskFile
+                {
+                    SpecialTaskId = spId,
+                    FileId = newFileId
+                };
+                spfRepo.Create(spf);
+            }
+        }
+        public Models.SpecialTask Update(Models.SpecialTask st)
+        {
+            var entity = new SpecialTaskEntity
+            {
+                Id = st.Id,
+                Description = st.Description,
+                ScheduleId = st.ScheduleId,
+                SpecialTaskType = (Entities.Enums.SpecialTaskType)(int)st.SpecialTaskType
+            };
+
+            repo.Update(entity);
+            return st;
+        }
         public void Create(Models.SpecialTask st)
         {
             var entity = new SpecialTaskEntity
@@ -65,9 +105,12 @@ namespace Diary.Services
         public void Delete(Guid id)
         {
             var spf = spfRepo.GetItem(x => x.SpecialTaskId == id);
-            fileService.Delete(spf.FileId);
+            if (spf != null)
+            {
 
-            spfRepo.Delete(spf.Id);
+                fileService.Delete(spf.FileId);
+                spfRepo.Delete(spf.Id);
+            }
             repo.Delete(id);
             
         }

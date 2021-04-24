@@ -10,8 +10,8 @@ namespace Diary.Interfaces
         IEnumerable<T> GetAllItems(Expression<Func<T, bool>> expression);
         T GetItem(Guid id);
         T GetItem(Expression<Func<T, bool>> expression);
-        void Create(T item);
-        void Update(T item);
+        T Create(T item);
+        T Update(T item);
         void Delete(Guid id);
     }
 }

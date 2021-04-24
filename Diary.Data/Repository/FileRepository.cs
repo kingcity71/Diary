@@ -11,12 +11,7 @@ namespace Diary.Data.Repository
         public FileRepository(IConfiguration configuration) : base(configuration)
         {
         }
-        public override void Create(File item)
-        {
-            using var ctx = new Context(_configuration);           
-            ctx.Add(item);
-            ctx.SaveChanges();
-        }
+        
         public File GetItem(string fileName)
         {
             using var ctx = new Context(_configuration);

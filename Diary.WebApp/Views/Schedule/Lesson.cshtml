@@ -81,6 +81,13 @@
     .hoverx:hover {
         cursor: pointer !important;
     }
+
+    .specialTaskUpdateBlock {
+        margin: 5px;
+        border: 1px solid lightgray;
+        border-radius: 5px;
+        padding: 5px;
+    }
 </style>
 
 <div class="container">
@@ -196,28 +203,94 @@
                     @foreach (var specialTask in Model.SpecialTasks)
                     {
                         var specialTaskName = GetSpecialTaskName(specialTask.SpecialTaskType);
-                        <div>@specialTaskName</div>
-                        <div>Описание : @specialTask.Description</div>
+                        <div class="specialTaskUpdateBlock row">
+                            <div class="col-2"></div>
+                            <div class="col-8">
+                                <label>Вид работы</label>
+                                <select class="form-control specialTaskTypeUpdate">
+                                    <option value="0" selected=@((int)specialTask.SpecialTaskType == 0)>Домашнее задание</option>
+                                    <option value="1" selected=@((int)specialTask.SpecialTaskType == 1)>Контрольная работа</option>
+                                    <option value="2" selected=@((int)specialTask.SpecialTaskType == 2)>Лабораторная работа</option>
+                                    <option value="3" selected=@((int)specialTask.SpecialTaskType == 3)>Экзамен</option>
+                                </select>
+                            </div>
+                            <div class="col-2"></div>
 
-                        <div>
-                            Файл : <a href="http://localhost:60125/File/Download?id=@(specialTask.FileId)"
-                                      target="_blank"
-                                      data-id="@specialTask.FileId"
-                                      download>
-                                Скачать файл
-                            </a>
+                            <div class="col-2"></div>
+                            <div class="col-8">
+                                <div>Описание</div>
+                                <textarea class="form-control specialTaskTypeDescr">@specialTask.Description</textarea>
+                            </div>
+                            <div class="col-2"></div>
+
+                            @if (specialTask.FileId != Guid.Empty)
+                            {
+                                <div class="col-4"></div>
+                                <div class="col-4">
+                                    Файл : <a class="specialTaskFileData"
+                                              href="/File/Download?id=@(specialTask.FileId)"
+                                              target="_blank"
+                                              data-id="@specialTask.FileId"
+                                              download>
+                                        Скачать файл
+                                    </a>
+                                </div>
+                                <div class="col-4"></div>
+
+                            }
+
+                            @if (hasPermission)
+                            {
+                                <div class="col-4"></div>
+                                @if (specialTask.FileId == Guid.Empty)
+                                {
+                                    <div class=" col-4" style="padding:3px">
+                                        <button class="btn btn-success w-100" onclick="$(this).next().click()">
+                                            Добавить файл
+                                        </button>
+                                        <input type="file" class="updateSpFile" data-id="@specialTask.Id" hidden>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class=" col-2" style="padding:3px">
+                                        <button class="w-100  btn btn-warning deleteSpFile" data-id="@specialTask.Id">
+                                            Удалить файл
+                                        </button>
+                                    </div>
+                                    <div class=" col-2" style="padding:3px">
+                                        <button class="w-100  btn btn-success" onclick="$(this).next().click()">
+                                            Заменить файл
+                                        </button>
+                                        <input type="file" class="updateSpFile" data-id="@specialTask.Id" hidden>
+                                    </div>
+                                }
+
+                                <div class="col-4"></div>
+                            }
+                            @if (hasPermission)
+                            {
+                                <div class="col-4"></div>
+                                <div class=" col-2" style="padding:3px">
+                                    <div class="w-100 btn btn-danger hoverx deleteSP" data-id="@specialTask.Id">
+                                        Удалить
+                                    </div>
+                                </div>
+                                <div class=" col-2" style="padding:3px">
+                                    <div class="w-100 btn btn-primary hoverx updateSP" data-id="@specialTask.Id">
+                                        Обновить
+                                    </div>
+                                </div>
+                                <div class="col-4"></div>
+                            }
                         </div>
-                        <div class="btn btn-danger hoverx deleteSP" data-id="@specialTask.Id">
-                            Удалить
-                        </div>
-                        <hr />
                     }
                 </div>
                 <div class="content-item hidden" data-num="3">
                     <div class="row m-1">
                         <div class="col-lg-3"></div>
                         <div class="col-lg-6">
-                            <label for="specialTaskTypeSelect"></label>
+                            <label for="specialTaskTypeSelect">Вид работы</label>
                             <select class="form-control" id="specialTaskTypeSelect">
                                 <option selected>Выберите тип задания</option>
                                 <option value="0">Домашнее задание</option>
@@ -389,4 +462,84 @@
             data: { id: id }
         })
     })
+</script>
+
+<!--TASK UPDATE-->
+<script>
+    $(".updateSP").on('click', function () {
+        if (!confirm("Уверены?")) return;
+        let el = $(this);
+        let parentEl = el.closest('.specialTaskUpdateBlock');
+
+        let Id = el.data('id');
+        let SpecialTaskType = $(parentEl.find('.specialTaskTypeUpdate')[0]).val();
+
+        let FileId = ""
+        if (parentEl.find('.specialTaskFileData').length > 0)
+            FileId = $(parentEl.find('.specialTaskFileData')[0]).data('id');
+
+        let Description = $(parentEl.find('.specialTaskTypeDescr')[0]).val();
+        let ScheduleId = $('#ScheduleInfo_Id').val();
+
+        let specialTask = { Id, ScheduleId, Description, SpecialTaskType, FileId };
+
+        $.ajax({
+            type: "POST",
+            url: "/schedule/UpdateSpecialTask",
+            data: { specialTask },
+            dataType: "json",
+            statusCode: {
+                200: function () {
+                    alert("Успешно");
+                    location.reload();
+                }
+            }
+        });
+    });
+
+    $('.deleteSpFile').on('click', function () {
+        if (!confirm("Уверены?")) return;
+        let spId = $(this).data('id');
+
+        $.ajax({
+            type: "DELETE",
+            url: "/schedule/DeleteSpecialTaskFile",
+            data: { spId },
+            dataType: "json",
+            statusCode: {
+                200: function () {
+                    alert("Успешно!");
+                    location.reload();
+                }
+            }
+        })
+    })
+
+    $('.updateSpFile').on('change', function () {
+        let spId = $(this).data('id');
+        let file = $(this).prop('files')[0];
+        let formData = new FormData();
+        formData.append('file', file)
+        $.ajax({
+            url: "/File/Upload",
+            data: formData,
+            processData: false,
+            contentType: false,
+            type: "POST",
+            success: function (data) {
+                $.ajax({
+                    url: "UpdateSpecialTaskFile",
+                    data: { newFileId: data, spId },
+                    type: "PATCH",
+                    statusCode: {
+                        200: function () {
+                            alert("Успешно");
+                            location.reload();
+                        }
+                    }
+                });
+            }
+        })
+    })
+
 </script>

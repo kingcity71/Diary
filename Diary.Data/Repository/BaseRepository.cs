@@ -17,11 +17,12 @@ namespace Diary.Data.Repository
         {
             _configuration = configuration;
         }
-        public virtual void Create(T item)
+        public T Create(T item)
         {
             using var ctx = new Context(_configuration);
-            ctx.Add(item);
+            var entity = ctx.Add(item).Entity;
             ctx.SaveChanges();
+            return entity;
         }
         public T GetItem(Expression<Func<T, bool>> expression)
         {
@@ -56,11 +57,12 @@ namespace Diary.Data.Repository
             return ctx.Find<T>(id);
         }
 
-        public void Update(T item)
+        public T Update(T item)
         {
             using var ctx = new Context(_configuration);
-            ctx.Update(item);
+            var entity = ctx.Update(item).Entity;
             ctx.SaveChanges();
+            return entity;
         }
     }
 }
