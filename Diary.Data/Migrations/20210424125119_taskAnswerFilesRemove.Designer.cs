@@ -4,14 +4,16 @@ using Diary.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Diary.Data.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20210424125119_taskAnswerFilesRemove")]
+    partial class taskAnswerFilesRemove
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -240,17 +242,8 @@ namespace Diary.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Comment")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("FileId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("ScoreResult")
-                        .HasColumnType("int");
 
                     b.Property<Guid>("SpecialTaskId")
                         .HasColumnType("uniqueidentifier");
@@ -258,12 +251,29 @@ namespace Diary.Data.Migrations
                     b.Property<Guid>("StudentId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.HasKey("Id");
+
+                    b.ToTable("SpecialTaskAnswers");
+                });
+
+            modelBuilder.Entity("Diary.Entities.SpecialTaskAnswerScore", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ScoreResult")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("TeacherId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.ToTable("SpecialTaskAnswers");
+                    b.ToTable("SpecialTaskAnswerScores");
                 });
 
             modelBuilder.Entity("Diary.Entities.SpecialTaskFile", b =>

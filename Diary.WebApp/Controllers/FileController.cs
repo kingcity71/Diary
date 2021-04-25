@@ -10,7 +10,6 @@ namespace Diary.WebApp.Controllers
 {
     public class FileController : Controller
     {
-        const string PATH = @"D:\Test Upload\";
         private readonly IFileService fileService;
         private readonly IConfiguration configuration;
 
@@ -27,7 +26,7 @@ namespace Diary.WebApp.Controllers
         [HttpPost]
         public IActionResult Upload(IFormFile file)
         {
-            Guid fileId = new Guid();
+            var fileId = new Guid();
             try
             {
                 fileId = fileService.Upload(file).Id;

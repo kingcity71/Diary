@@ -62,6 +62,8 @@ namespace Diary.WebApp
             services.AddScoped<IScoreService, ScoreService>();
             services.AddScoped<ISpecialTaskService, SpecialTaskService>();
 
+            services.AddScoped<ISpecialTaskAnswerSerivce, SpecialTaskAnswerSerivce>();
+
             services.AddScoped<IFileService, FileService>();
 
             services.AddScoped<IClassService, ClassService>();

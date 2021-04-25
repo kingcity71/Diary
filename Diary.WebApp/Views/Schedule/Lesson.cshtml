@@ -13,6 +13,8 @@
     };
 
     var hasPermission = User.IsInRole("Admin") || User.IsInRole("Teacher");
+    var isStudent = User.IsInRole("Student");
+    var isTeacher = User.IsInRole("Teacher");
 
     string GetSpecialTaskName(SpecialTaskType type)
     {
@@ -71,7 +73,6 @@
         .menu-item:hover {
             box-shadow: rgba(0,0,0,0.5) 0px 0px 5px;
             cursor: pointer;
-            //background: rgb(128, 128, 128);
         }
 
     .menu-item-selected {
@@ -87,6 +88,13 @@
         border: 1px solid lightgray;
         border-radius: 5px;
         padding: 5px;
+    }
+
+    .specialTaskAnswer {
+        border: 1px solid black;
+        border-radius: 5px;
+        padding: 5px;
+        background-color: rgb(171, 255, 176);
     }
 </style>
 
@@ -115,18 +123,21 @@
                 <div class="menu-item" data-num="2">
                     Задания
                 </div>
-                <div class="menu-item" data-num="3">
-                    Добавить задание
-                </div>
+
+                @if (hasPermission)
+                {
+                    <div class="menu-item" data-num="4">
+                        Добавить задание
+                    </div>
+                }
             </div>
         </div>
         <div class="col-10">
             <div class="content">
                 <div class="content-item" data-num="0">
-
                     <div class="row m-1">
-                        <div class="col-lg-10 text-center"><h3> Активность на уроке</h3></div>
-                        <div class="col-lg-2">
+                        <div class="col-10 text-center"><h3> Активность на уроке</h3></div>
+                        <div class="col-2">
                             @if (hasPermission)
                             {
                                 <div class="hoverx btn btn-success" id="btn-save">
@@ -136,19 +147,18 @@
                         </div>
                     </div>
                     <div class="row m-1">
-                        <div class="col-lg-4">
+                        <div class="col-4">
                             ФИО
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-4">
                             Оценка
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-4">
                             Комментарий
                         </div>
                     </div>
                     @foreach (var student in Model.ScheduleInfo.Class.Students)
                     {
-
                         <div class="row m-1 student-line" data-id="@student.Id">
                             <div class="col-lg-4">
                                 @student.Name
@@ -203,11 +213,12 @@
                     @foreach (var specialTask in Model.SpecialTasks)
                     {
                         var specialTaskName = GetSpecialTaskName(specialTask.SpecialTaskType);
+                        var answers = Model.SpecialTaskAnswers.Where(x => x.SpecialTaskId == specialTask.Id).ToList();
                         <div class="specialTaskUpdateBlock row">
                             <div class="col-2"></div>
                             <div class="col-8">
                                 <label>Вид работы</label>
-                                <select class="form-control specialTaskTypeUpdate">
+                                <select class="form-control specialTaskTypeUpdate" disabled="@(!hasPermission)">
                                     <option value="0" selected=@((int)specialTask.SpecialTaskType == 0)>Домашнее задание</option>
                                     <option value="1" selected=@((int)specialTask.SpecialTaskType == 1)>Контрольная работа</option>
                                     <option value="2" selected=@((int)specialTask.SpecialTaskType == 2)>Лабораторная работа</option>
@@ -219,7 +230,7 @@
                             <div class="col-2"></div>
                             <div class="col-8">
                                 <div>Описание</div>
-                                <textarea class="form-control specialTaskTypeDescr">@specialTask.Description</textarea>
+                                <textarea class="form-control specialTaskTypeDescr" disabled="@(!hasPermission)">@specialTask.Description</textarea>
                             </div>
                             <div class="col-2"></div>
 
@@ -283,43 +294,233 @@
                                 </div>
                                 <div class="col-4"></div>
                             }
+
+                            @if (answers.Any())
+                            {
+                                <div class="col-12" style="border-top: 1px solid lightgray"></div>
+                                <div class="text-center col-12">
+                                    <h3>
+                                        Ответы
+                                        <span id="toggleAnswers" class="hoverx" style="text-decoration:underline">(открыть)</span>
+                                    </h3>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="row specialTaskAnswer" style="display:none">
+                                        @foreach (var answer in answers)
+                                        {
+                                            <div class="col-2"></div>
+                                            <div class="col-8">
+                                                <h4>Выполнил : @answer.Student.Name</h4>
+                                            </div>
+                                            <div class="col-2"></div>
+
+                                            <div class="col-2"></div>
+                                            <div class="col-8">
+                                                <label>Коментарии учащегося по работе</label>
+                                                <textarea class="form-control spaDescription" disabled="@(isTeacher)">@answer.Description</textarea>
+                                            </div>
+                                            <div class="col-2"></div>
+
+                                            @if (Guid.Empty != answer.FileId)
+                                            {
+
+                                                <div class="col-2"></div>
+                                                <div class="col-8">
+                                                    <label>Файл ответа : </label>
+                                                    <a href="/File/Download?id=@(answer.FileId)"
+                                                       target="_blank"
+                                                       download>
+                                                        Скачать файл
+                                                    </a>
+                                                </div>
+                                                <div class="col-2"></div>
+                                            }
+
+                                            <div class="col-12" style="border-top: 1px solid black"></div>
+
+                                            <div class="col-2"></div>
+                                            <div class="col-8">
+                                                <label>Оценка</label>
+                                                <select class="form-control spaScore" disabled="@(isStudent)">
+                                                    @foreach (var scoreMap in scoreMapper)
+                                                    {
+                                                        <option value="@scoreMap.Key"
+                                                                selected="@(scoreMap.Key == answer.ScoreResult)">
+                                                            @scoreMap.Value
+                                                        </option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="col-2"></div>
+
+                                            <div class="col-2"></div>
+                                            <div class="col-8">
+                                                <label>Коментарии оценивающего по работе</label>
+                                                <textarea class="form-control spaComment" disabled="@(isStudent)">@answer.Comment</textarea>
+                                            </div>
+                                            <div class="col-2"></div>
+
+                                            @if (!isTeacher)
+                                            {
+                                                <div class="col-4"></div>
+                                                @if (answer.FileId == Guid.Empty)
+                                                {
+                                                    <div class=" col-4" style="padding:3px">
+                                                        <button class="btn btn-success w-100" onclick="$(this).next().click()">
+                                                            Добавить файл
+                                                        </button>
+                                                        <input type="file" class="updateSpaFile" data-id="@answer.Id" hidden>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class=" col-2" style="padding:3px">
+                                                        <button class="w-100  btn btn-warning deleteSpaFile" data-id="@answer.Id">
+                                                            Удалить файл
+                                                        </button>
+                                                    </div>
+                                                    <div class=" col-2" style="padding:3px">
+                                                        <button class="w-100  btn btn-success" onclick="$(this).next().click()">
+                                                            Заменить файл
+                                                        </button>
+                                                        <input type="file" class="updateSpaFile" data-id="@answer.Id" hidden>
+                                                    </div>
+                                                }
+
+                                                <div class="col-4"></div>
+                                            }
+                                            @if (!isTeacher)
+                                            {
+                                                <div class="col-4"></div>
+                                                <div class=" col-2" style="padding:3px">
+                                                    <div class="w-100 btn btn-danger hoverx deleteSPA" data-id="@answer.Id">
+                                                        Удалить
+                                                    </div>
+                                                </div>
+                                                <div class=" col-2" style="padding:3px">
+                                                    <div class="w-100 btn btn-primary hoverx updateSPA" data-id="@answer.Id" data-spid="@answer.SpecialTaskId">
+                                                        Обновить
+                                                    </div>
+                                                </div>
+                                                <div class="col-4"></div>
+                                            }
+
+                                            @if (isTeacher)
+                                            {
+                                                <div class="col-4"></div>
+                                                <div class=" col-4" style="padding:3px">
+                                                    <div class="w-100 btn btn-primary hoverx updateSPA" data-id="@answer.Id" data-spId="@answer.SpecialTaskId">
+                                                        Обновить
+                                                    </div>
+                                                </div>
+                                                <div class="col-4"></div>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            }
+
+                            @if (!answers.Any() && isStudent)
+                            {
+                                <div class="col-12">
+                                    <div class="spa row">
+                                        <div class="col-2"></div>
+                                        <div class="col-8">
+                                            <label>Коментарии учащегося по работе</label>
+                                            <textarea class="form-control spaDescription"></textarea>
+                                        </div>
+                                        <div class="col-2"></div>
+
+                                        <div class="col-4"></div>
+                                        <div class=" col-2" style="padding:3px">
+                                            <div class="w-100 btn btn-primary hoverx" data-id="@specialTask.Id" onclick="$(this).next().click()">
+                                                Добавить файл
+                                            </div>
+                                            <input type="file" class="spaFile" data-id="@specialTask.Id" hidden>
+                                        </div>
+                                        <div class=" col-2" style="padding:3px">
+                                            <div class="w-100 btn btn-success hoverx uploadSpa" data-id="@specialTask.Id">
+                                                Отправить
+                                            </div>
+                                        </div>
+                                        <div class="col-4"></div>
+                                    </div>
+                                </div>
+                            }
                         </div>
                     }
                 </div>
-                <div class="content-item hidden" data-num="3">
-                    <div class="row m-1">
-                        <div class="col-lg-3"></div>
-                        <div class="col-lg-6">
-                            <label for="specialTaskTypeSelect">Вид работы</label>
-                            <select class="form-control" id="specialTaskTypeSelect">
-                                <option selected>Выберите тип задания</option>
-                                <option value="0">Домашнее задание</option>
-                                <option value="1">Контрольная работа</option>
-                                <option value="2">Лабораторная работа</option>
-                                <option value="3">Экзамен</option>
-                            </select>
-                        </div>
-                        <div class="col-lg-3"></div>
 
-                        <div class="col-lg-2"></div>
-                        <div class="col-lg-8">
-                            <label for="specialTaskDescription">Описание</label>
-                            <textarea class="form-control" id="specialTaskDescription"></textarea>
-                        </div>
-                        <div class="col-lg-2">
-                            <div class="btn btn-success hoverx" id="addTask">
-                                OK
+                @if (hasPermission)
+                {
+                    <div class="content-item hidden" data-num="4">
+                        <div class="row m-1">
+                            <div class="col-2"></div>
+                            <div class="col-8">
+                                <label for="specialTaskTypeSelect">Вид работы</label>
+                                <select class="form-control" id="specialTaskTypeSelect">
+                                    <option selected>Выберите тип задания</option>
+                                    <option value="0">Домашнее задание</option>
+                                    <option value="1">Контрольная работа</option>
+                                    <option value="2">Лабораторная работа</option>
+                                    <option value="3">Экзамен</option>
+                                </select>
                             </div>
-                        </div>
-                        <input type="file" id="specialTaskFileUpload">
-                    </div>
+                            <div class="col-2"></div>
 
-                </div>
+                            <div class="col-2"></div>
+                            <div class="col-8">
+                                <label for="specialTaskDescription">Описание</label>
+                                <textarea class="form-control" id="specialTaskDescription"></textarea>
+                            </div>
+                            <div class="col-2"></div>
+
+                            <div class="col-3"></div>
+                            <div class=" col-3" style="padding:3px">
+                                <button class="btn btn-primary w-100 hoverx" onclick="$(this).next().click()">
+                                    Добавить файл
+                                </button>
+                                <input type="file" id="specialTaskFileUpload" hidden>
+                            </div>
+
+                            <div class="col-3" style="padding:3px">
+                                <div class="btn btn-success w-100 hoverx" id="addTask">
+                                    OK
+                                </div>
+                            </div>
+                            <div class="col-3"></div>
+                        </div>
+
+                    </div>
+                }
+
+
             </div>
         </div>
     </div>
 </div>
+
 <script>
+    let Success = function () {
+        alert("Успешно!");
+        location.reload();
+    }
+</script>
+
+<script>
+    $('#toggleAnswers').on('click', function () {
+        let text = $(this).text();
+        if (text == "(открыть)") {
+            $('.specialTaskAnswer').slideDown();
+            $(this).text("(скрыть)")
+        }
+        else {
+            $('.specialTaskAnswer').slideUp();
+            $(this).text("(открыть)")
+        }
+    })
+
     $('#addTask').on('click', function () {
         let uploadTask = function (fileId) {
 
@@ -336,15 +537,9 @@
 
                 type: "POST",
                 dataType: "json",
-                success: function (data) {
-                    debugger;
-                    alert("Успешно!");
-                    location.reload();
-                },
                 statusCode: {
                     200: function () {
-                        alert("Успешно!");
-                        location.reload();
+                        Success()
                     }
                 }
 
@@ -400,15 +595,14 @@
                     $.get(`/schedule/bind/${scheduleId}/${fileId}`, function () {
                         $('#files').removeClass("hidden");
                         $('#files').addClass("visible");
-                        let li = '<a href="http://localhost:60125/File/Download?id=' + fileId + '"'
+                        let li = '<a href="/File/Download?id=' + fileId + '"'
                             + ' target="_blank" '
                             + ` data-id="${data}"`
                             + 'download>'
                             + 'Новый файл</a>';
                         $('#filesList').append(li);
 
-                        alert("Файл Успешно Загружен!");
-                        location.reload();
+                        Success();
                     })
                 }
             }
@@ -455,8 +649,7 @@
             dataType: "json",
             statusCode: {
                 200: function () {
-                    alert("Успешно!");
-                    location.reload();
+                    Success()
                 }
             },
             data: { id: id }
@@ -490,8 +683,7 @@
             dataType: "json",
             statusCode: {
                 200: function () {
-                    alert("Успешно");
-                    location.reload();
+                    Success()
                 }
             }
         });
@@ -508,8 +700,7 @@
             dataType: "json",
             statusCode: {
                 200: function () {
-                    alert("Успешно!");
-                    location.reload();
+                    Success()
                 }
             }
         })
@@ -533,8 +724,7 @@
                     type: "PATCH",
                     statusCode: {
                         200: function () {
-                            alert("Успешно");
-                            location.reload();
+                            Success()
                         }
                     }
                 });
@@ -542,4 +732,128 @@
         })
     })
 
+</script>
+
+<!-- ANSWERS-->
+<script>
+    $('.uploadSpa').on('click', function () {
+        let parentEl = $(this).closest('.spa');
+        let spaFile = $(parentEl.find('.spaFile')[0]);
+        let SpecialTaskId = $(this).data('id');
+
+        let uploadTask = function (fileId) {
+            let FileId = fileId;
+            let Description = $(parentEl.find('.spaDescription')[0]).val();
+            let spa = { FileId, Description, SpecialTaskId };
+            $.ajax({
+                url: "/STA/Create",
+                data: { spa },
+                type: "POST",
+                dataType: "json",
+                statusCode: {
+                    200: function () {
+                        Success()
+                    }
+                }
+            })
+        }
+
+        if (spaFile.prop('files').length > 0) {
+            let file = spaFile.prop('files')[0];
+            let formData = new FormData();
+            formData.append('file', file)
+            $.ajax({
+                url: "/File/Upload",
+                data: formData,
+                processData: false,
+                contentType: false,
+                type: "POST",
+                success: function (data) {
+                    uploadTask(data);
+                }
+            })
+        }
+        else uploadTask();
+    })
+
+    $('.deleteSpaFile').on('click', function () {
+        if (!confirm("Уверены?")) return;
+        let spaId = $(this).data('id');
+        $.ajax({
+            url: "/STA/File",
+            type: "DELETE",
+            dataType: "json",
+            data: { spaId },
+            statusCode: {
+                200: function () {
+                    Success()
+                }
+            }
+        });
+    });
+
+    $('.updateSpaFile').on('change', function () {
+        let spaId = $(this).data('id');
+        let file = $(this).prop('files')[0];
+        let formData = new FormData();
+        formData.append('file', file)
+        $.ajax({
+            url: "/File/Upload",
+            data: formData,
+            processData: false,
+            contentType: false,
+            type: "POST",
+            success: function (data) {
+                $.ajax({
+                    url: "/STA/File",
+                    data: { newFileId: data, spaId },
+                    type: "PATCH",
+                    statusCode: {
+                        200: function () {
+                            Success()
+                        }
+                    }
+                });
+            }
+        })
+    })
+
+    $('.deleteSPA').on('click', function () {
+        if (!confirm("Уверены?")) return;
+
+        let spaId = $(this).data('id');
+
+        $.ajax({
+            url: "/STA/Answer",
+            type: "DELETE",
+            dataType: "json",
+            data: { spaId },
+            statusCode: {
+                200: function () {
+                    Success();
+                }
+            }
+        })
+    });
+
+    $('.updateSPA').on('click', function () {
+        let parentEl = $(this).closest('.specialTaskAnswer');
+        let Id = $(this).data('id');
+        let SpecialTaskId = $(this).data('spid');
+        let Description = $(parentEl.find('.spaDescription')[0]).val();
+        let Comment = $(parentEl.find('.spaComment')[0]).val();
+        let ScoreResult = $(parentEl.find('.spaScore')[0]).val();
+        let spa = { Id, SpecialTaskId, Description, Comment, ScoreResult };
+        $.ajax({
+            url: "/STA/Answer",
+            type: "PATCH",
+            dataType: "ajax",
+            data: { spa },
+            statusCode: {
+                200: function () {
+                    Success()
+                }
+            }
+        })
+    })
 </script>

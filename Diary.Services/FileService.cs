@@ -17,6 +17,8 @@ namespace Diary.Services
             this.fileRepo = fileRepo;
             _path = configuration["FilePath"];
         }
+        
+        
         public byte[] Download(Guid id)
         {
             var fileEntity = fileRepo.GetItem(id);
